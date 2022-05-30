@@ -1,4 +1,6 @@
 import random
+from sol_initiale import *
+import json
 
 MATRICE_DISTANCE = []
 INTERVENANTS = []
@@ -89,8 +91,7 @@ def contraintes(solution):
                 for x in missions:
                     if MISSIONS[j][3] >= MISSIONS[x][2] >= MISSIONS[j][2] and (x != j) and (MISSIONS[j][1] == MISSIONS[x][1]):
                         return False
-    
-    # fonctionne jusqu'ici.
+
 
     # 5.  Accorder a chaque intervenant au moins une heure de pause-midi par jour entre midi et 14h
     # on ignore cette contrainte pour le moment
@@ -118,14 +119,20 @@ def contraintes(solution):
             if temps_travaille[k] > 600:
                 return False
 
-    print("7 passé")
     # 8.  Respecter l’amplitude de la journee de travail de chaque intervenant (amplitude = 12h)
     for i in range(len(INTERVENANTS)):
-        missions = [y for y in range(len(MISSIONS)) if solution[i][y] == 1]
-        debut = [MISSIONS[y][2] for y in missions]
-        fin = [MISSIONS[y][3] for y in missions]
-        if max(fin) - min(debut) > 720:
-            return False
+        temps_travaille = {1:[2000, 0], 2:[2000, 0], 3:[2000, 0], 4:[2000, 0], 5:[2000, 0]}
+        for j in range(len(MISSIONS)):
+            if solution[i][j] == 1:
+                if MISSIONS[j][2] < temps_travaille[MISSIONS[j][1]][0]:
+                    temps_travaille[MISSIONS[j][1]][0] = MISSIONS[j][2]
+                if MISSIONS[j][3] > temps_travaille[MISSIONS[j][1]][1]:
+                    temps_travaille[MISSIONS[j][1]][1] = MISSIONS[j][3]
+        for k in temps_travaille:
+            if temps_travaille[k][1] - temps_travaille[k][0] > 720:
+                return False
+
+
     with open("res.txt", "a") as fichier:
         fichier.write(f"8:\n{str(solution)}\n\n")
     
@@ -136,51 +143,9 @@ def contraintes(solution):
     return True
 
 
-def cree_solution_initiale():
-    """
-    Cree une solution initiale aléatoirement
-    """
-    a = []
-    solution = []
-    lpc = [i for i in range(len(INTERVENANTS)) if INTERVENANTS[i][1] == "LPC"]
-    lsf = [i for i in range(len(INTERVENANTS)) if INTERVENANTS[i][1] == "LSF"]
-
-    for i in range(len(INTERVENANTS)):
-        a.append([0 for j in range(len(INTERVENANTS))])
-        a[i][i] = 1
-
-    jour = -1
-    tourniquet_lpc = lpc.index(random.choice(lpc))
-    tourniquet_lsf = lsf.index(random.choice(lsf))
-    for i in range(len(MISSIONS)):
-        if MISSIONS[i][1] != jour:
-            jour = MISSIONS[i][1]
-            if MISSIONS[i][4] == "LPC":
-                choix = random.choice(lpc)
-                solution.append(a[choix])
-                tourniquet_lpc = lpc.index(choix)
-            else:
-                choix = random.choice(lsf)
-                solution.append(a[choix])
-                tourniquet_lsf = lsf.index(choix)
-        else:
-            if MISSIONS[i][4] == "LPC":
-                tourniquet_lpc += 1
-                solution.append(a[lpc[tourniquet_lpc % (len(INTERVENANTS)//2)]])
-            else:
-                tourniquet_lsf += 1
-                solution.append(a[lsf[tourniquet_lsf % (len(INTERVENANTS)//2)]])
-
-    transpose = list(map(list, zip(*solution)))
-    
-    return transpose
-
-
-
 def intervenant_libre(missions, mission):
     """
     Renvoies True si l'intervenant est libre pour la mission, False sinon
-    vérifies actuellement les contraintes 1, 2, 3, 4, 7, 8 (9 a faire plus tard)
     """
     for i in range(len(missions)):
         if missions[i] == 1:
@@ -193,33 +158,12 @@ def intervenant_libre(missions, mission):
     return True
 
 
-def nouvelle_solution():
-    ban_list = []
-    solution = []
-    
-    for i in range(len(INTERVENANTS)):
-        missions_a_faire = []
-        for j in range(len(MISSIONS)):
-            if j not in ban_list and (INTERVENANTS[i][1] == MISSIONS[j][4]): # Vérification de la contrainte 2 et 4
-                if missions_a_faire == [] or 1 not in missions_a_faire:
-                    missions_a_faire.append(1)
-                    ban_list.append(j)
-                elif intervenant_libre(missions_a_faire, j): # Vérification de la contrainte 3 et peut-etre 9 (plus tard)
-                    missions_a_faire.append(1)
-                    ban_list.append(j)
-                else:
-                    missions_a_faire.append(0)
-            else:
-                missions_a_faire.append(0)
-        solution.append(missions_a_faire)
-    
-    print("Longueur ban_list:", len(ban_list))
-    if len(ban_list) != len(MISSIONS):
-        print("Pas toutes les missions sont attribuées :(")
-        return None
-    
-    return solution
+def read_sols(fichier):
+    with open("TRUE_res.txt", 'r') as f:
+        fich = f.read().split('\n\n')[:-1]
+    solutions = [json.loads(i) for i in fich]
 
+    return solutions
 
 
 def main():
@@ -235,10 +179,12 @@ def main():
         print("Erreur de saisie, fin du programme.")
         return
 
-    sol = nouvelle_solution()
-    contraintes(sol)
+    #sol = nouvelle_solution()
+    solutions = read_sols("TRUE_res.txt")
+    solution = cree_vrai_aleatoire(INTERVENANTS, MISSIONS)
+    contraintes(solution)
     print("\nSolution:")
-    for i in sol:
+    for i in solution:
         print(i)
     
 if __name__ == "__main__":
