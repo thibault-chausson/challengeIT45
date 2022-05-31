@@ -1,5 +1,6 @@
 import json as js
 import numpy as np
+import fitnessEmployes as fE
 
 MATRICE_DISTANCE = []
 INTERVENANTS = []
@@ -58,49 +59,35 @@ def charger_solution(dossier):
     return SOLUTIONS
 
 
-def alpha(SOLUTIONS):
-    """
-    Retourne le coefficient alpha de la fonction de cout
-    """
-    nbMiss = len(SOLUTIONS[0][0])
-    alpha = 100 / nbMiss
-    return alpha
-
-
-def penalite(SOLUTIONS, MISSION, INTERVENANT):
-    """
-    Retourne la penalite de la solution
-    """
-    nbMiss = len(MISSION)
-    nbInter = len(INTERVENANT)
-    nbSol = len(SOLUTIONS)
-    penalite = np.zeros(nbSol)
-    for k in range(nbSol):
-        for i in range(nbInter):
-            for j in range(nbMiss):
-                if SOLUTIONS[k][i][j] == 1:
-                    if MISSION[j][5] != INTERVENANT[i][2]:
-                        penalite[k] += 1
-    return penalite
-
-
-def fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS):
-    """
-    Retourne le fitness de chaque solution
-    """
-    al = alpha(SOLUTIONS)
-    pe = penalite(SOLUTIONS, MISSIONS, INTERVENANTS)
-    nbSol = len(SOLUTIONS)
-    fitness = np.zeros(nbSol)
+def sumWOH(MISSIONS, INTERVENANTS, SOLUTIONS):
+    nbSol=len(SOLUTIONS)
+    somme=np.zeros(nbSol)
+    nbHeuresTrav = fE.nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS)
+    nbNonTrav=(fE.nombre_heures_non_travaillée_et_sup(nbHeuresTrav, INTERVENANTS))[0]
     for i in range(nbSol):
-        fitness[i] = al * pe[i]
-    return fitness
+        for j in range(len(INTERVENANTS)):
+            somme[i]+=nbNonTrav[i][j]+nbHeuresTrav[i][j]
+    return (somme)
+
+
+def beta():
+    return 100/45
+
+def fitnessSESSAD(MISSIONS, INTERVENANTS, SOLUTIONS,DISTANCE):
+    summe = sumWOH(MISSIONS, INTERVENANTS, SOLUTIONS)
+    kap=fE.kapa(DISTANCE,INTERVENANTS)
+    bet=beta()
+    moyDis= ###Pas encore de fonction
+    maxDis= ###Pas encore de fonction
+    f=(bet*summe+kap*moyDis+kap*maxDis)/3
+    return f
+
 
 
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    print(fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS))
+    print(sumWOH(MISSIONS, INTERVENANTS, SOLUTIONS))
 
 
 if __name__ == "__main__":

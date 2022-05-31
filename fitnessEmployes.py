@@ -95,7 +95,7 @@ def ecart_type(tableau):
     return sol
 
 
-def ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS):   #Il y a un problème
+def ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS):   #Il y a un probleme
     nbSol=len(SOLUTIONS)
     nbMission=len(MISSIONS)
     nbInter=len(INTERVENANTS)
@@ -168,6 +168,12 @@ def moyenne_toutes_distances(DISTANCES,INTERVENANTS): #DISTANCES est une matrice
     return somme/nbInter
 
 
+def kapa(DISTANCES,INTERVENANTS):
+    moy = moyenne_toutes_distances(DISTANCES, INTERVENANTS)
+    kapa = 100 / moy
+    return kapa
+
+
 
 def fitnessEm(ecart_WH, ecart_OH, ecart_D, INTERVENANTS, DISTANCES): #Non testée
     zeta = 10
@@ -176,9 +182,8 @@ def fitnessEm(ecart_WH, ecart_OH, ecart_D, INTERVENANTS, DISTANCES): #Non testé
     for i in range(nbInter):
         sumHeureTrav += INTERVENANTS[i][3]
     gamma = 100 / sumHeureTrav
-    moy = moyenne_toutes_distances(DISTANCES,INTERVENANTS)
-    kapa = 100 / moy
-    fitness = (zeta * ecart_WH + gamma * ecart_OH + kapa * ecart_D) / 3
+    kap = kapa(DISTANCES, INTERVENANTS)
+    fitness = (zeta * ecart_WH + gamma * ecart_OH + kap * ecart_D) / 3
     return fitness
 
 
