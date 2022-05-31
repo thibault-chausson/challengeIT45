@@ -100,13 +100,36 @@ def ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS):   #Il y a un problème
     nbMission=len(MISSIONS)
     nbInter=len(INTERVENANTS)
     nbJour=5
-    ordre=[[[]]]
-    print(ordre)
+    ordre=[]
     for i in range(nbSol):
+        auxUser = []
         for j in range(nbInter):
+
+            aux2 = []
+            auxL=[]
+            auxM = []
+            auxMe = []
+            auxJ = []
+            auxV = []
             for k in range(nbMission):
                 if (SOLUTIONS[i][j][k]==1):
-                    ordre[i][j][MISSIONS[k][1]].append((MISSIONS[k][0], MISSIONS[k][2]))
+                    if (MISSIONS[k][1]==1):
+                        auxL.append((MISSIONS[k][0], MISSIONS[k][2]))
+                    if (MISSIONS[k][1] == 2):
+                        auxM.append((MISSIONS[k][0], MISSIONS[k][2]))
+                    if (MISSIONS[k][1]==3):
+                        auxMe.append((MISSIONS[k][0], MISSIONS[k][2]))
+                    if (MISSIONS[k][1]==4):
+                        auxJ.append((MISSIONS[k][0], MISSIONS[k][2]))
+                    if (MISSIONS[k][1]==5):
+                        auxV.append((MISSIONS[k][0], MISSIONS[k][2]))
+            aux2.append(auxL)
+            aux2.append(auxM)
+            aux2.append(auxMe)
+            aux2.append(auxJ)
+            aux2.append(auxV)
+        ordre.append(aux2)
+    print(ordre)
     for i in range(nbSol):
         for j in range(nbInter):
             for k in range(nbJour):
@@ -164,7 +187,7 @@ def main():
     SOLUTIONS = charger_solution("TRUE_res.txt")
     nb_tra = nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS)
     nb_non_tra, nb_sup = nombre_heures_non_travaillée_et_sup(nb_tra, INTERVENANTS)
-    print(moyenne_toutes_distances(MATRICE_DISTANCE, INTERVENANTS))
+    print(ordre_mission(SOLUTIONS,MISSIONS,INTERVENANTS))
     #print(ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS))
 
 
