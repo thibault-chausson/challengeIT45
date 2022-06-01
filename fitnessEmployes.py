@@ -95,67 +95,42 @@ def ecart_type(tableau):
     return sol
 
 
-def ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS):   #Il y a un probleme
-    nbSol=len(SOLUTIONS)
-    nbMission=len(MISSIONS)
-    nbInter=len(INTERVENANTS)
-    nbJour=5
-    ordre=[]
-    for i in range(nbSol):
-        auxUser = []
-        for j in range(nbInter):
 
-            aux2 = []
-            auxL=[]
-            auxM = []
-            auxMe = []
-            auxJ = []
-            auxV = []
-            for k in range(nbMission):
-                if (SOLUTIONS[i][j][k]==1):
-                    if (MISSIONS[k][1]==1):
-                        auxL.append((MISSIONS[k][0], MISSIONS[k][2]))
-                    if (MISSIONS[k][1] == 2):
-                        auxM.append((MISSIONS[k][0], MISSIONS[k][2]))
-                    if (MISSIONS[k][1]==3):
-                        auxMe.append((MISSIONS[k][0], MISSIONS[k][2]))
-                    if (MISSIONS[k][1]==4):
-                        auxJ.append((MISSIONS[k][0], MISSIONS[k][2]))
-                    if (MISSIONS[k][1]==5):
-                        auxV.append((MISSIONS[k][0], MISSIONS[k][2]))
-            aux2.append(auxL)
-            aux2.append(auxM)
-            aux2.append(auxMe)
-            aux2.append(auxJ)
-            aux2.append(auxV)
-        ordre.append(aux2)
-    print(ordre)
-    for i in range(nbSol):
-        for j in range(nbInter):
-            for k in range(nbJour):
-                ordre[i][j][k].sort(key=lambda x: x[1])
-    return ordre
+def activites_intervenants(solution):
+    """
+    Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
+    """
+    miss_intervenants = []
+    for i in range(len(INTERVENANTS)):
+        missions = {1: [], 2: [], 3: [], 4: [], 5: []}
+        edt = {1: [], 2: [], 3: [], 4: [], 5: []}
+        for j in range(len(MISSIONS)):
+            if solution[i][j] == 1:
+                missions[MISSIONS[j][1]].append((j, MISSIONS[j][2]))
+        for jour in missions:
+            temp = sorted(missions[jour], key=lambda x: x[1])
+            edt[jour] = [i[0] for i in temp]
+
+        miss_intervenants.append(edt)
+
+    return miss_intervenants
 
 
 
-
-def distance_employé (SOLUTIONS, DISTANCES, ORDRE): #Non testée
-    nbSol = len(SOLUTIONS)
-    nbMiss = len(SOLUTIONS[0])
-    nbInter = len(SOLUTIONS[0][0])
-    nbJour=5
-    distance = np.zeros((nbSol, nbInter))
-    for i in range(nbSol):
-        for j in range (nbInter):
-            for k in range(nbJour):
-                nbOrdre = len(ORDRE[i][j][k])
-                for l in range(nbOrdre):
-                    if (l == 0):
-                        distance[i][j] += DISTANCES[0][ORDRE[i][j][k][l]]
-                    elif (l==nbOrdre-1):
-                        distance[i][j] += DISTANCES[ORDRE[i][j][k][l]][0]
-                    else:
-                        distance[i][j] += DISTANCES[ORDRE[i][j][k][l]][ORDRE[i][j][k][l+1]]
+def distance_employé (DISTANCES, planning_1_mission): #Non testée
+    nbInter = len(planning_1_mission)
+    nbJour=len(planning_1_mission[0])
+    distance = np.zeros(nbInter) #distance par semaine pour un intervenant
+    for i in range(nbInter):
+        for j in range(1,nbJour+1):
+            nbMissionsJournal = len(planning_1_mission[i][j])
+            for k in range(nbMissionsJournal+1):
+                if k ==0 :
+                    distance[i] += DISTANCES[0][planning_1_mission[i][j][k]]
+                elif k==nbMissionsJournal:
+                    distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][0]
+                else:
+                    distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
     return distance
 
 
@@ -192,7 +167,8 @@ def main():
     SOLUTIONS = charger_solution("TRUE_res.txt")
     nb_tra = nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS)
     nb_non_tra, nb_sup = nombre_heures_non_travaillée_et_sup(nb_tra, INTERVENANTS)
-    print(ordre_mission(SOLUTIONS,MISSIONS,INTERVENANTS))
+    #print(activites_intervenants(SOLUTIONS[0]))
+    print(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0])))
     #print(ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS))
 
 
