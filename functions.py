@@ -138,23 +138,29 @@ def contraintes(solution):
     
     print("8 passé")
     # 9.  Un intervenant doit avoir assez de temps pour se deplacer d’une mission a une autre.
-    # a voir car il nous faut une vitesse de déplacement.
+    soluce = activites_intervenants(solution)
+    vitesse_deplacement = 833 # exprimée en m/minutes
 
-    return True
+    for edt in soluce:
+        for jour in edt:
+            temps_parcouru = -1
+            if len(edt[jour]) == 2:
+                depart = edt[jour][0] + 1
+                arrivee = edt[jour][1] + 1
+                temps_parcouru = MATRICE_DISTANCE[depart][arrivee] / vitesse_deplacement
+                if temps_parcouru > MISSIONS[edt[jour][1]][2] - MISSIONS[edt[jour][0]][3]:
+                    return False
 
-
-def intervenant_libre(missions, mission):
-    """
-    Renvoies True si l'intervenant est libre pour la mission, False sinon
-    """
-    for i in range(len(missions)):
-        if missions[i] == 1:
-            last_i = i
-            date_fin = MISSIONS[i][3]
+            elif len(edt[jour]) > 2:
+                for i in range(len(edt[jour])-1):
+                    depart = edt[jour][i] + 1
+                    arrivee = edt[jour][i+1] + 1
+                    temps_parcouru = MATRICE_DISTANCE[depart][arrivee] / vitesse_deplacement
+                    if temps_parcouru > MISSIONS[edt[jour][i + 1]][2] - MISSIONS[edt[jour][i]][3]:
+                        return False
     
-    # LIGNE IMPORTANTE POUR LA CONTRAINTE 9, ON PEUT FAIRE date_fin + temps_deplacement
-    if MISSIONS[mission][2] <= date_fin and MISSIONS[mission][1] == MISSIONS[last_i][1]:
-        return False
+    print("9 passé")
+    
     return True
 
 
@@ -164,6 +170,28 @@ def read_sols(fichier):
     solutions = [json.loads(i) for i in fich]
 
     return solutions
+
+
+def activites_intervenants(solution):
+    """
+    Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
+    """
+    miss_intervenants = []
+    for i in range(len(INTERVENANTS)):
+        missions = {1:[], 2:[], 3:[], 4:[], 5:[]}
+        edt = {1:[], 2:[], 3:[], 4:[], 5:[]}
+        for j in range(len(MISSIONS)):
+            if solution[i][j] == 1:
+                missions[MISSIONS[j][1]].append((j, MISSIONS[j][2]))
+
+        for jour in missions:
+            temp = sorted(missions[jour], key=lambda x: x[1])
+            edt[jour] = [i[0] for i in temp]
+
+        miss_intervenants.append(edt)
+    
+    return miss_intervenants
+
 
 
 def main():
@@ -180,12 +208,17 @@ def main():
         return
 
     #sol = nouvelle_solution()
+
     solutions = read_sols("TRUE_res.txt")
+    compteur, good = (0, 0)
+    for i in solutions:
+        compteur +=1
+        if contraintes(i):
+            good+=1
+    print(good, compteur)
     solution = cree_vrai_aleatoire(INTERVENANTS, MISSIONS)
-    contraintes(solution)
-    print("\nSolution:")
-    for i in solution:
-        print(i)
+    #contraintes(solution)
+
     
 if __name__ == "__main__":
     main()

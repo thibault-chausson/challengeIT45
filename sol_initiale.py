@@ -87,6 +87,21 @@ def cree_vrai_aleatoire(INTERVENANTS, MISSIONS):
     return list(map(list, zip(*sol)))
 
 
+def intervenant_libre(missions, mission):
+    """
+    Renvoies True si l'intervenant est libre pour la mission, False sinon
+    """
+    for i in range(len(missions)):
+        if missions[i] == 1:
+            last_i = i
+            date_fin = MISSIONS[i][3]
+    
+    # LIGNE IMPORTANTE POUR LA CONTRAINTE 9, ON PEUT FAIRE date_fin + temps_deplacement
+    if MISSIONS[mission][2] <= date_fin and MISSIONS[mission][1] == MISSIONS[last_i][1]:
+        return False
+    return True
+
+
 def nouvelle_solution(INTERVENANTS, MISSIONS):
     """
     vérifies actuellement les contraintes 1, 2, 3, 4, 7, 8 (9 a faire plus tard)
