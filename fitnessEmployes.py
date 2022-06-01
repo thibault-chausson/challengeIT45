@@ -133,6 +133,13 @@ def distance_employé (DISTANCES, planning_1_mission): #Non testée
                     distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
     return distance
 
+def distance_employs_toutes_missions (SOLUTIONS, DISTANCES):
+    distance_employe = []
+    for i in range(len(SOLUTIONS)):
+        planning = activites_intervenants(SOLUTIONS[i])
+        distance_employe.append(distance_employé(DISTANCES, planning))
+    return distance_employe
+
 
 def moyenne_toutes_distances(DISTANCES,INTERVENANTS): #DISTANCES est une matrice carrée
     nbInter = len(INTERVENANTS)
@@ -148,17 +155,20 @@ def kapa(DISTANCES,INTERVENANTS):
     kapa = 100 / moy
     return kapa
 
-
-
-def fitnessEm(ecart_WH, ecart_OH, ecart_D, INTERVENANTS, DISTANCES): #Non testée
-    zeta = 10
+def gama(INTERVENANTS):
     nbInter = len(INTERVENANTS)
     sumHeureTrav = 0
     for i in range(nbInter):
         sumHeureTrav += INTERVENANTS[i][3]
     gamma = 100 / sumHeureTrav
+    return gamma
+
+
+def fitnessEm(ecart_WH, ecart_OH, ecart_D, INTERVENANTS, DISTANCES): #Pour une seule solution
+    zeta = 10
+    ga=gama(INTERVENANTS)
     kap = kapa(DISTANCES, INTERVENANTS)
-    fitness = (zeta * ecart_WH + gamma * ecart_OH + kap * ecart_D) / 3
+    fitness = (zeta * ecart_WH + ga * ecart_OH + kap * ecart_D) / 3
     return fitness
 
 
@@ -168,8 +178,13 @@ def main():
     nb_tra = nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS)
     nb_non_tra, nb_sup = nombre_heures_non_travaillée_et_sup(nb_tra, INTERVENANTS)
     #print(activites_intervenants(SOLUTIONS[0]))
-    print(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0])))
+    #print(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0])))
     #print(ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS))
+    ecart_dis=ecart_type(distance_employs_toutes_missions(SOLUTIONS, MATRICE_DISTANCE))
+    ecart_WH = ecart_type(nb_non_tra)
+    ecart_OH = ecart_type(nb_sup)
+    for k in range(len(ecart_WH)):
+        print(fitnessEm(ecart_WH[k], ecart_OH[k], ecart_dis[k], INTERVENANTS, MATRICE_DISTANCE))
 
 
 if __name__ == "__main__":
