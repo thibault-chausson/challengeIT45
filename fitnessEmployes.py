@@ -177,14 +177,15 @@ def main():
     SOLUTIONS = charger_solution("TRUE_res.txt")
     nb_tra = nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS)
     nb_non_tra, nb_sup = nombre_heures_non_travaillée_et_sup(nb_tra, INTERVENANTS)
-    #print(activites_intervenants(SOLUTIONS[0]))
+    print(SOLUTIONS[0])
+    print(activites_intervenants(SOLUTIONS[0]))
     #print(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0])))
     #print(ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS))
     ecart_dis=ecart_type(distance_employs_toutes_missions(SOLUTIONS, MATRICE_DISTANCE))
     ecart_WH = ecart_type(nb_non_tra)
     ecart_OH = ecart_type(nb_sup)
-    for k in range(len(ecart_WH)):
-        print(fitnessEm(ecart_WH[k], ecart_OH[k], ecart_dis[k], INTERVENANTS, MATRICE_DISTANCE))
+    #for k in range(len(ecart_WH)):
+     #   print(fitnessEm(ecart_WH[k], ecart_OH[k], ecart_dis[k], INTERVENANTS, MATRICE_DISTANCE))
 
 
 if __name__ == "__main__":
