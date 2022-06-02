@@ -152,12 +152,25 @@ def genetique_employes(solutions, nbGeneration, probaMutation, distances, interv
     return solutions
 
 
+def mini(tab):
+    mini = tab[0]
+    indice=0
+    for i in range(len(tab)):
+        if tab[i]<mini:
+            mini=tab[i]
+            indice=i
+    return indice, mini
+
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     print(min(tableau_fitnessEM(MISSIONS,INTERVENANTS,SOLUTIONS,MATRICE_DISTANCE)))
-    apres = genetique_employes(SOLUTIONS, 500, 0.3, MATRICE_DISTANCE, INTERVENANTS, MISSIONS,0.1)
+    apres = genetique_employes(SOLUTIONS, 1000, 0.05, MATRICE_DISTANCE, INTERVENANTS, MISSIONS,0.01)
     print(min(tableau_fitnessEM(MISSIONS,INTERVENANTS,apres,MATRICE_DISTANCE)))
+
+    indi,petit=mini(tableau_fitnessEM(MISSIONS,INTERVENANTS,apres,MATRICE_DISTANCE))
+
+    print(fEm.activites_intervenants(apres[indi],INTERVENANTS,MISSIONS))
 
 
 if __name__ == "__main__":
