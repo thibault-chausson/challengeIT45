@@ -2,6 +2,7 @@ import json as js
 import statistics as st
 import numpy as np
 import random as rd
+import copy as cop
 
 MATRICE_DISTANCE = []
 INTERVENANTS = []
@@ -106,7 +107,7 @@ def reproduction (solution1, solution2, ligDebut, ligFin, colDebut, colFin): #fo
     """
     nblig = len(solution1)
     nbcol = len(solution1[0])
-    fille = solution1.copy()
+    fille = cop.deepcopy(solution1)
     for i in range(ligDebut, ligFin+1):
         for j in range(colDebut, colFin+1):
             fille[i][j] = solution2[i][j]

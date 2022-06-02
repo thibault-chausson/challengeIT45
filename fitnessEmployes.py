@@ -123,11 +123,20 @@ def distance_employé (DISTANCES, planning_1_mission):
             nbMissionsJournal = len(planning_1_mission[i][j])
             for k in range(nbMissionsJournal+1):
                 if k ==0 :
-                    distance[i] += DISTANCES[0][planning_1_mission[i][j][k]]
+                    if len(planning_1_mission[i][j])==0:
+                        distance[i]+=0
+                    else:
+                        distance[i] += DISTANCES[0][planning_1_mission[i][j][k]]
                 elif k==nbMissionsJournal:
-                    distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][0]
+                    if len(planning_1_mission[i][j])==0:
+                        distance[i]+=0
+                    else:
+                        distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][0]
                 else:
-                    distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
+                    if len(planning_1_mission[i][j])==0:
+                        distance[i]+=0
+                    else:
+                        distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
     return distance
 
 def distance_employs_toutes_missions (solutions, DISTANCES,inter,mis):

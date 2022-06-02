@@ -91,7 +91,7 @@ def maxiFit(tableau):
     return indice , maxi
 
 
-def genetique_employes(solutions, nbGeneration, probaMutation, distances, intervenants, mission):
+def genetique_employes(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
     nbGene = 0
     nbPlanning = len(solutions)
     nbInter = len(intervenants)
@@ -105,19 +105,21 @@ def genetique_employes(solutions, nbGeneration, probaMutation, distances, interv
         fille1 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter-1, 0, finCol-1)
         fille2 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter-1, finCol, nbMis-1)
         # On choisie ce que l'on va faire avec les enfants
-        fitnessFille1 = fitnessEmInitialisation(mission,intervenants,fille1,distances)
-        fitnessFille2 = fitnessEmInitialisation(mission,intervenants,fille2,distances)
+
+
 
         valideFille1 = fct.contraintes(fille1)
         valideFille2 = fct.contraintes(fille2)
 
         if valideFille1:
+            fitnessFille1 = fitnessEmInitialisation(mission, intervenants, fille1, distances)
             indice, max = maxiFit(tableau_fit)
             if fitnessFille1 < max:
                 solutions[indice] = fille1
                 tableau_fit[indice] = fitnessFille1
 
         if valideFille2:
+            fitnessFille2 = fitnessEmInitialisation(mission, intervenants, fille2, distances)
             indice, max = maxiFit(tableau_fit)
             if fitnessFille2 < max:
                 solutions[indice] = fille2
@@ -125,13 +127,21 @@ def genetique_employes(solutions, nbGeneration, probaMutation, distances, interv
 
         ## On fait une mutation
         # On choisit une solution
-        solutionChoisie = rd.randint(0, nbPlanning - 1)
 
         if rd.random() < probaMutation:
-            mutate= tls.mutation(solutions[solutionChoisie])
+            solutionChoisie = rd.randint(0, nbPlanning - 1)
+            fitnessChoisiePourMutation = fitnessEmInitialisation(mission, intervenants, solutions[solutionChoisie], distances)
+            mutate = tls.mutation(solutions[solutionChoisie])
             valideMutate = fct.contraintes(mutate)
             if valideMutate:
-                solutions[solutionChoisie] = mutate
+                empire=rd.random()
+                if empire>probaMissionEmpire:
+                    fitnessMutate = fitnessEmInitialisation(mission, intervenants, mutate, distances)
+                    if fitnessMutate < fitnessChoisiePourMutation:
+                        solutions[solutionChoisie] = mutate
+                        tableau_fit[solutionChoisie] = fitnessMutate
+                else:
+                    solutions[solutionChoisie] = mutate
 
         if valideFille1 or valideFille2:
             nbGene += 1
@@ -145,9 +155,9 @@ def genetique_employes(solutions, nbGeneration, probaMutation, distances, interv
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    print(max(tableau_fitnessEM(MISSIONS,INTERVENANTS,SOLUTIONS,MATRICE_DISTANCE)))
-    apres = genetique_employes(SOLUTIONS, 100, 0.3, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
-    print(max(tableau_fitnessEM(MISSIONS,INTERVENANTS,apres,MATRICE_DISTANCE)))
+    print(min(tableau_fitnessEM(MISSIONS,INTERVENANTS,SOLUTIONS,MATRICE_DISTANCE)))
+    apres = genetique_employes(SOLUTIONS, 500, 0.3, MATRICE_DISTANCE, INTERVENANTS, MISSIONS,0.1)
+    print(min(tableau_fitnessEM(MISSIONS,INTERVENANTS,apres,MATRICE_DISTANCE)))
 
 
 if __name__ == "__main__":
