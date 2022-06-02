@@ -59,54 +59,51 @@ def charger_solution(dossier):
     return SOLUTIONS
 
 
-def nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS):
-    nbInter = len(INTERVENANTS)
-    nbSol = len(SOLUTIONS)
-    nbMiss = len(MISSIONS)
-    nbHeuresTravaille = np.zeros((nbSol, nbInter))
-    for i in range(nbSol):
-        for j in range(nbInter):
-            for k in range(nbMiss):
-                if (SOLUTIONS[i][j][k] == 1):
-                    nbHeuresTravaille[i][j] += (MISSIONS[k][3] - MISSIONS[k][2]) / 60
+def nombre_heures_travaillée(missions, inter, solution_1_planning): #tableau des heures travaillées pour un planning (tableau pour chaque inter)
+    nbInter = len(inter)
+    nbSol = len(missions)
+    nbMiss = len(missions)
+    nbHeuresTravaille = np.zeros(nbInter)
+    for j in range(nbInter):
+        for k in range(nbMiss):
+            if (solution_1_planning[j][k] == 1):
+                nbHeuresTravaille[j] += (missions[k][3] - missions[k][2]) / 60
     return nbHeuresTravaille
 
 
-def nombre_heures_non_travaillée_et_sup(nbHeuresTravaille, INTERVENANTS):
-    nbInter = len(nbHeuresTravaille[0])
-    nbSol = len(nbHeuresTravaille)
-    nbHeuresNonTravaillee = np.zeros((nbSol, nbInter))
-    nbHeuresSup = np.zeros((nbSol, nbInter))
-    for i in range(nbSol):
-        for j in range(nbInter):
-            heure = INTERVENANTS[j][3] - nbHeuresTravaille[i][j]
-            if (heure > 0):
-                nbHeuresNonTravaillee[i][j] = heure
-            else:
-                nbHeuresSup[i][j] = abs(heure)
+def nombre_heures_non_travaillée_et_sup(nbHeuresTravaille, inter):
+    nbInter = len(inter)
+    nbHeuresNonTravaillee = np.zeros(nbInter)
+    nbHeuresSup = np.zeros(nbInter)
+    for j in range(nbInter):
+        heure = inter[j][3] - nbHeuresTravaille[j]
+        if (heure > 0):
+            nbHeuresNonTravaillee[j] = heure
+        else:
+            nbHeuresSup[j] = abs(heure)
     return nbHeuresNonTravaillee, nbHeuresSup
 
 
 def ecart_type(tableau):
-    nbSol = len(tableau)
-    sol = np.zeros(nbSol)
-    for i in range(nbSol):
+    nb = len(tableau)
+    sol = np.zeros(nb)
+    for i in range(nb):
         sol[i] = st.pstdev(tableau[i])
     return sol
 
 
 
-def activites_intervenants(solution):
+def activites_intervenants(solution,inter,mis):
     """
     Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
     """
     miss_intervenants = []
-    for i in range(len(INTERVENANTS)):
+    for i in range(len(inter)):
         missions = {1: [], 2: [], 3: [], 4: [], 5: []}
         edt = {1: [], 2: [], 3: [], 4: [], 5: []}
-        for j in range(len(MISSIONS)):
+        for j in range(len(mis)):
             if solution[i][j] == 1:
-                missions[MISSIONS[j][1]].append((j, MISSIONS[j][2]))
+                missions[mis[j][1]].append((j, mis[j][2]))
         for jour in missions:
             temp = sorted(missions[jour], key=lambda x: x[1])
             edt[jour] = [i[0] for i in temp]
@@ -117,7 +114,7 @@ def activites_intervenants(solution):
 
 
 
-def distance_employé (DISTANCES, planning_1_mission): #Non testée
+def distance_employé (DISTANCES, planning_1_mission):
     nbInter = len(planning_1_mission)
     nbJour=len(planning_1_mission[0])
     distance = np.zeros(nbInter) #distance par semaine pour un intervenant
@@ -133,16 +130,16 @@ def distance_employé (DISTANCES, planning_1_mission): #Non testée
                     distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
     return distance
 
-def distance_employs_toutes_missions (SOLUTIONS, DISTANCES):
+def distance_employs_toutes_missions (solutions, DISTANCES,inter,mis):
     distance_employe = []
-    for i in range(len(SOLUTIONS)):
-        planning = activites_intervenants(SOLUTIONS[i])
+    for i in range(len(solutions)):
+        planning = activites_intervenants(solutions[i],inter,mis)
         distance_employe.append(distance_employé(DISTANCES, planning))
     return distance_employe
 
 
-def moyenne_toutes_distances(DISTANCES,INTERVENANTS): #DISTANCES est une matrice carrée
-    nbInter = len(INTERVENANTS)
+def moyenne_toutes_distances(DISTANCES,inter): #DISTANCES est une matrice carrée
+    nbInter = len(inter)
     nbMission = len(DISTANCES)
     somme=0
     for i in range(nbMission):
@@ -150,24 +147,24 @@ def moyenne_toutes_distances(DISTANCES,INTERVENANTS): #DISTANCES est une matrice
     return somme/nbInter
 
 
-def kapa(DISTANCES,INTERVENANTS):
-    moy = moyenne_toutes_distances(DISTANCES, INTERVENANTS)
+def kapa(DISTANCES,inter):
+    moy = moyenne_toutes_distances(DISTANCES, inter)
     kapa = 100 / moy
     return kapa
 
-def gama(INTERVENANTS):
-    nbInter = len(INTERVENANTS)
+def gama(inter):
+    nbInter = len(inter)
     sumHeureTrav = 0
     for i in range(nbInter):
-        sumHeureTrav += INTERVENANTS[i][3]
+        sumHeureTrav += inter[i][3]
     gamma = 100 / sumHeureTrav
     return gamma
 
 
-def fitnessEm(ecart_WH, ecart_OH, ecart_D, INTERVENANTS, DISTANCES): #Pour une seule solution
+def fitnessEm(ecart_WH, ecart_OH, ecart_D, inter, DISTANCES): #Pour une seule solution
     zeta = 10
-    ga=gama(INTERVENANTS)
-    kap = kapa(DISTANCES, INTERVENANTS)
+    ga=gama(inter)
+    kap = kapa(DISTANCES, inter)
     fitness = (zeta * ecart_WH + ga * ecart_OH + kap * ecart_D) / 3
     return fitness
 
@@ -175,17 +172,19 @@ def fitnessEm(ecart_WH, ecart_OH, ecart_D, INTERVENANTS, DISTANCES): #Pour une s
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    nb_tra = nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS)
-    nb_non_tra, nb_sup = nombre_heures_non_travaillée_et_sup(nb_tra, INTERVENANTS)
     print(SOLUTIONS[0])
-    print(activites_intervenants(SOLUTIONS[0]))
+    nb_tra = nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS[0])
+    nb_non_tra, nb_sup = nombre_heures_non_travaillée_et_sup(nb_tra, INTERVENANTS)
+    print(nb_tra)
+    print(nb_non_tra, nb_sup)
+    #print(activites_intervenants(SOLUTIONS[0]))
     #print(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0])))
     #print(ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS))
-    ecart_dis=ecart_type(distance_employs_toutes_missions(SOLUTIONS, MATRICE_DISTANCE))
-    ecart_WH = ecart_type(nb_non_tra)
-    ecart_OH = ecart_type(nb_sup)
+    ecart_dis = st.pstdev(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0], INTERVENANTS, MISSIONS)))
+    ecart_WH = st.pstdev(nb_non_tra)
+    ecart_OH = st.pstdev(nb_sup)
     #for k in range(len(ecart_WH)):
-     #   print(fitnessEm(ecart_WH[k], ecart_OH[k], ecart_dis[k], INTERVENANTS, MATRICE_DISTANCE))
+    print(fitnessEm(ecart_WH, ecart_OH, ecart_dis, INTERVENANTS, MATRICE_DISTANCE))
 
 
 if __name__ == "__main__":

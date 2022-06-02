@@ -100,8 +100,8 @@ def fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS):
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    print(SOLUTIONS[0])
-    #print(fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS))
+    #print(SOLUTIONS[0])
+    print(fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS))
 
 
 if __name__ == "__main__":

@@ -53,11 +53,29 @@ def charge_fichier_csv(dossier):
     return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
 
 
+
+def charger_solution(dossier):
+    with open(f"./{dossier}", 'r') as f:
+        fich = f.read().split('\n\n')[:-1]
+    SOLUTIONS = [js.loads(i) for i in fich]
+    return SOLUTIONS
+
+
+
+
+
+
+
 exempleFitness = [[12, 98, 56, 9, 152, 64, 567, 74, 989],
                   [12, 98, 56, 9, 152, 64, 567, 74, 989],
                   [12, 98, 56, 9, 152, 64, 567, 74, 989],
                   [12, 98, 56, 9, 152, 64, 567, 74, 989]
                   ]
+
+exemple=[[1,2,3,4],
+         [5,6,7,8],
+         [9,10,11,12],
+        [13,14,15,16]]
 
 exempleFitness2 = [[112, 198, 156, 119, 1152, 164, 1567, 174, 1989],
                    [112, 198, 156, 119, 1152, 164, 1567, 174, 1989],
@@ -105,10 +123,25 @@ def tri_langage(Mission):
     return LPC, LSF
 
 
+def mutation(solution):
+    """
+    Retourne la solution mutée
+    """
+    nblig = len(solution)
+    nbcol = len(solution[0])
+    rdLine1 = rd.randint(0, nblig-1)
+    rdCol = rd.randint(0, nbcol-1)
+    rdLine2 = rd.randint(0, nblig-1)
+    (solution[rdLine1][rdCol], solution[rdLine2][rdCol]) = (solution[rdLine2][rdCol], solution[rdLine1][rdCol])
+    return solution
+
+
+
 
 def main():
     charge_fichier_csv("45-4")
-    print(tri_langage(MISSIONS))
+    SOLUTIONS = charger_solution("TRUE_res.txt")
+    print(SOLUTIONS)
 
 
 if __name__ == "__main__":
