@@ -61,7 +61,6 @@ def charger_solution(dossier):
 
 def nombre_heures_travaillée(missions, inter, solution_1_planning): #tableau des heures travaillées pour un planning (tableau pour chaque inter)
     nbInter = len(inter)
-    nbSol = len(missions)
     nbMiss = len(missions)
     nbHeuresTravaille = np.zeros(nbInter)
     for j in range(nbInter):

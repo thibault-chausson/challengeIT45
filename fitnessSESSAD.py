@@ -59,41 +59,58 @@ def charger_solution(dossier):
     return SOLUTIONS
 
 
-def sumWOH(MISSIONS, INTERVENANTS, SOLUTIONS):
-    nbSol=len(SOLUTIONS)
-    somme=np.zeros(nbSol)
-    nbHeuresTrav = fE.nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS)
-    nbNonTrav=(fE.nombre_heures_non_travaillée_et_sup(nbHeuresTrav, INTERVENANTS))[0]
-    for i in range(nbSol):
-        for j in range(len(INTERVENANTS)):
-            somme[i]+=nbNonTrav[i][j]+nbHeuresTrav[i][j]
+def sumWOH_1(mission, inter, solution):
+    somme = 0
+    nbHeuresTrav = fE.nombre_heures_travaillée(mission, inter, solution)
+    nbNonTrav = (fE.nombre_heures_non_travaillée_et_sup(nbHeuresTrav, inter))[0]
+    for j in range(len(inter)):
+        somme += nbNonTrav[j] + nbHeuresTrav[j]
     return (somme)
 
 
+def sumWOH_tous(mission, inter, solutions):
+    nbSol = len(solutions)
+    somme = np.zeros(nbSol)
+    for i in range(nbSol):
+        somme[i] = sumWOH_1(mission, inter, solutions[i])
+    return somme
+
+
 def beta():
-    return 100/45
+    return 100 / 45
+
 
 def moyDist(disEmploy):
-    moy=0
+    moy = 0
     for i in range(len(disEmploy)):
-        moy+=disEmploy[i]
-    return moy/len(disEmploy)
+        moy += disEmploy[i]
+    return moy / len(disEmploy)
+
 
 def maxDist(disEmploy):
-    maxi=0
+    maxi = 0
     for i in range(len(disEmploy)):
-        if disEmploy[i]>maxi:
-            maxi=disEmploy[i]
+        if disEmploy[i] > maxi:
+            maxi = disEmploy[i]
     return maxi
 
-def fitnessSESSAD(MISSIONS, INTERVENANTS, SOLUTIONS,DISTANCE, dist_1_Semaine):
-    summe = sumWOH(MISSIONS, INTERVENANTS, SOLUTIONS)
-    kap=fE.kapa(DISTANCE,INTERVENANTS)
-    bet=beta()
-    moyDis= moyDist(dist_1_Semaine)
-    maxDis= maxDist(dist_1_Semaine)
-    f=(bet*summe+kap*moyDis+kap*maxDis)/3
+
+def fitnessSESSAD(mission, inter, solution, DISTANCE, dist_1_Semaine):
+    somme = sumWOH_1(mission, inter, solution)
+    kap = fE.kapa(DISTANCE, inter)
+    bet = beta()
+    moyDis = moyDist(dist_1_Semaine)
+    maxDis = maxDist(dist_1_Semaine)
+    f = (bet * somme + kap * moyDis + kap * maxDis) / 3
     return f
+
+
+def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE, dist_1_Semaine):
+    nbSol = len(solutions)
+    fit = np.zeros(nbSol)
+    for i in range(nbSol):
+        fit[i] = fitnessSESSAD(mission, inter, solutions[i], DISTANCE, dist_1_Semaine)
+    return fit
 
 
 def activites_intervenants(solution):
@@ -119,9 +136,9 @@ def activites_intervenants(solution):
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    #print(activites_intervenants(SOLUTIONS[0]))
-    dis1=fE.distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0]))
-    print(fitnessSESSAD(MISSIONS, INTERVENANTS, SOLUTIONS,MATRICE_DISTANCE,dis1))
+    # print(activites_intervenants(SOLUTIONS[0]))
+    dis1 = fE.distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0]))
+    print(fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE, dis1))
 
 
 if __name__ == "__main__":
