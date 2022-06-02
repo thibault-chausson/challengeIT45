@@ -4,6 +4,7 @@ import numpy as np
 import random as rd
 import fitnessEmployes as fEm
 import tools as tls
+import functions as fct
 
 
 MATRICE_DISTANCE = []
@@ -90,7 +91,7 @@ def maxiFit(tableau):
     return indice , maxi
 
 
-def génétique_employes(solutions, nbGeneration, probaMutation, distances, intervenants, mission):
+def genetique_employes(solutions, nbGeneration, probaMutation, distances, intervenants, mission):
     nbGene = 0
     nbPlanning = len(solutions)
     nbInter = len(intervenants)
@@ -107,8 +108,8 @@ def génétique_employes(solutions, nbGeneration, probaMutation, distances, inte
         fitnessFille1 = fitnessEmInitialisation(mission,intervenants,fille1,distances)
         fitnessFille2 = fitnessEmInitialisation(mission,intervenants,fille2,distances)
 
-        valideFille1 = #TODO : Vérifier si la solution est valide
-        valideFille2 = #TODO : Vérifier si la solution est valide
+        valideFille1 = fct.contraintes(fille1)
+        valideFille2 = fct.contraintes(fille2)
 
         if valideFille1:
             indice, max = maxiFit(tableau_fit)
@@ -128,7 +129,7 @@ def génétique_employes(solutions, nbGeneration, probaMutation, distances, inte
 
         if rd.random() < probaMutation:
             mutate= tls.mutation(solutions[solutionChoisie])
-            valideMutate = #TODO : Vérifier si la solution est valide
+            valideMutate = fct.contraintes(mutate)
             if valideMutate:
                 solutions[solutionChoisie] = mutate
 
@@ -144,7 +145,9 @@ def génétique_employes(solutions, nbGeneration, probaMutation, distances, inte
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    print(tls.choixParents(tableau_fitnessEM(MISSIONS,INTERVENANTS,SOLUTIONS,MATRICE_DISTANCE)))
+    print(max(tableau_fitnessEM(MISSIONS,INTERVENANTS,SOLUTIONS,MATRICE_DISTANCE)))
+    apres = genetique_employes(SOLUTIONS, 100, 0.3, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
+    print(max(tableau_fitnessEM(MISSIONS,INTERVENANTS,apres,MATRICE_DISTANCE)))
 
 
 if __name__ == "__main__":

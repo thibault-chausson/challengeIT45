@@ -136,7 +136,7 @@ def contraintes(solution):
     with open("res.txt", "a") as fichier:
         fichier.write(f"8:\n{str(solution)}\n\n")
     
-    print("8 passé")
+    #print("8 passé")
     # 9.  Un intervenant doit avoir assez de temps pour se deplacer d’une mission a une autre.
     soluce = activites_intervenants(solution)
     vitesse_deplacement = 833 # exprimée en m/minutes
@@ -159,7 +159,7 @@ def contraintes(solution):
                     if temps_parcouru > MISSIONS[edt[jour][i + 1]][2] - MISSIONS[edt[jour][i]][3]:
                         return False
     
-    print("9 passé")
+    #print("9 passé")
     
     return True
 
