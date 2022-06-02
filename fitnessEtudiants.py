@@ -58,59 +58,50 @@ def charger_solution(dossier):
     return SOLUTIONS
 
 
-def alpha(sol):
+def alpha(SOLUTIONS):
     """
     Retourne le coefficient alpha de la fonction de cout
     """
-    nbMiss = len(sol[0])
+    nbMiss = len(SOLUTIONS[0][0])
     alpha = 100 / nbMiss
     return alpha
 
 
-def penalite_1(solution, mis, inter):
+def penalite(SOLUTIONS, MISSION, INTERVENANT):
     """
     Retourne la penalite de la solution
     """
-    nbMiss = len(mis)
-    nbInter = len(inter)
-    penalite = 0
-    for i in range(nbInter):
-        for j in range(nbMiss):
-            if solution[i][j] == 1:
-                if mis[j][5] != inter[i][2]:
-                    penalite += 1
+    nbMiss = len(MISSION)
+    nbInter = len(INTERVENANT)
+    nbSol = len(SOLUTIONS)
+    penalite = np.zeros(nbSol)
+    for k in range(nbSol):
+        for i in range(nbInter):
+            for j in range(nbMiss):
+                if SOLUTIONS[k][i][j] == 1:
+                    if MISSION[j][5] != INTERVENANT[i][2]:
+                        penalite[k] += 1
     return penalite
 
-def toute_pena (solutions, mis, inter):
-    nbSol = len(solutions)
-    pena=np.zeros(nbSol)
-    for i in range(nbSol):
-        pena[i] = penalite_1(solutions[i], mis, inter)
-    return pena
 
-
-def fitnessEtudiants_1(solution, mis, inter):
+def fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS):
     """
     Retourne le fitness de chaque solution
     """
-    al = alpha(solution)
-    pe = penalite_1(solution, mis, inter)
-    fitness = al * pe
+    al = alpha(SOLUTIONS)
+    pe = penalite(SOLUTIONS, MISSIONS, INTERVENANTS)
+    nbSol = len(SOLUTIONS)
+    fitness = np.zeros(nbSol)
+    for i in range(nbSol):
+        fitness[i] = al * pe[i]
     return fitness
-
-def fitnessEtudiants_tableau(solution, mis, inter):
-    fitness = np.zeros(len(solution))
-    for i in range(len(solution)):
-        fitness[i] = fitnessEtudiants_1(solution[i], mis, inter)
-    return fitness
-
 
 
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     #print(SOLUTIONS[0])
-    print(fitnessEtudiants_tableau(SOLUTIONS, MISSIONS, INTERVENANTS))
+    print(fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS))
 
 
 if __name__ == "__main__":

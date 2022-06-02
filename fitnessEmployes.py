@@ -5,8 +5,8 @@ import numpy as np
 MATRICE_DISTANCE = []
 INTERVENANTS = []
 MISSIONS = []
-
 SOLUTIONS = []  # Les lignes representent les formateurs (interfaces) et les colones les missions
+
 
 
 def charge_fichier_csv(dossier):
@@ -55,27 +55,51 @@ def charge_fichier_csv(dossier):
 def charger_solution(dossier):
     with open(f"./{dossier}", 'r') as f:
         fich = f.read().split('\n\n')[:-1]
-    SOLUTIONS = [js.loads(i) for i in fich]
+    for i in fich:
+        SOLUTIONS.append(js.loads(i))
     return SOLUTIONS
 
 
-def nombre_heures_travaillée(missions, inter, solution_1_planning): #tableau des heures travaillées pour un planning (tableau pour chaque inter)
-    nbInter = len(inter)
-    nbMiss = len(missions)
-    nbHeuresTravaille = np.zeros(nbInter)
-    for j in range(nbInter):
-        for k in range(nbMiss):
+def stats_heures(solution):
+    """
+    Renvoies des informations sur le nombre d'heures travaillées par les intervenants
+    """
+    inters = len(INTERVENANTS)
+    nb_heuresTravaille = np.zeros(inters)
+    nb_heuresNonTravaille = np.zeros(inters)
+    nb_heureSup = np.zeros(inters)
+
+    for i in range(inters):
+        for j in range(len(MISSIONS)):
+            if solution[i][j] == 1:
+                nb_heuresTravaille[i] += (MISSIONS[j][3] - MISSIONS[j][2]) / 60
+
+        tps = nb_heuresTravaille[i] - INTERVENANTS[i][3]
+        if tps < 0:
+            nb_heuresNonTravaille[i] += abs(tps)
+        else:
+            nb_heureSup[i] = abs(tps)
+    
+    return nb_heuresTravaille, nb_heuresNonTravaille, nb_heureSup
+
+
+
+
+"""
+def nombre_heures_travaillee(missions, inter, solution_1_planning): #tableau des heures travaillées pour un planning (tableau pour chaque inter)
+    nbHeuresTravaille = np.zeros(len(inter))
+    for j in range(len(inter)):
+        for k in range(len(missions)):
             if (solution_1_planning[j][k] == 1):
                 nbHeuresTravaille[j] += (missions[k][3] - missions[k][2]) / 60
     return nbHeuresTravaille
 
 
 def nombre_heures_non_travaillée_et_sup(nbHeuresTravaille, inter):
-    nbInter = len(inter)
-    nbHeuresNonTravaillee = np.zeros(nbInter)
-    nbHeuresSup = np.zeros(nbInter)
-    for j in range(nbInter):
-        heure = inter[j][3] - nbHeuresTravaille[j]
+    nbHeuresNonTravaillee = np.zeros(len(INTERVENANTS))
+    nbHeuresSup = np.zeros(len(INTERVENANTS))
+    for j in range(len(INTERVENANTS)):
+        heure = INTERVENANTS[j][3] - nbHeuresTravaille[j]
         if (heure > 0):
             nbHeuresNonTravaillee[j] = heure
         else:
@@ -90,32 +114,40 @@ def ecart_type(tableau):
         sol[i] = st.pstdev(tableau[i])
     return sol
 
+def distance_employs_toutes_missions (solutions, DISTANCES,inter,mis):
+    distance_employe = []
+    for i in range(len(solutions)):
+        planning = activites_intervenants(solutions[i],inter,mis)
+        distance_employe.append(distance_employé(DISTANCES, planning))
+    return distance_employe
+"""
 
 
-def activites_intervenants(solution,inter,mis):
+def activites_intervenants(solution):
     """
     Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
     """
     miss_intervenants = []
-    for i in range(len(inter)):
-        missions = {1: [], 2: [], 3: [], 4: [], 5: []}
-        edt = {1: [], 2: [], 3: [], 4: [], 5: []}
-        for j in range(len(mis)):
+    for i in range(len(INTERVENANTS)):
+        missions = {1:[], 2:[], 3:[], 4:[], 5:[]}
+        edt = {1:[], 2:[], 3:[], 4:[], 5:[]}
+        for j in range(len(MISSIONS)):
             if solution[i][j] == 1:
-                missions[mis[j][1]].append((j, mis[j][2]))
+                missions[MISSIONS[j][1]].append((j, MISSIONS[j][2]))
+
         for jour in missions:
             temp = sorted(missions[jour], key=lambda x: x[1])
             edt[jour] = [i[0] for i in temp]
 
         miss_intervenants.append(edt)
-
+    
     return miss_intervenants
 
 
 
-def distance_employé (DISTANCES, planning_1_mission):
+def distance_employe(planning_1_mission):
     nbInter = len(planning_1_mission)
-    nbJour=len(planning_1_mission[0])
+    nbJour = len(planning_1_mission[0])
     distance = np.zeros(nbInter) #distance par semaine pour un intervenant
     for i in range(nbInter):
         for j in range(1,nbJour+1):
@@ -125,75 +157,52 @@ def distance_employé (DISTANCES, planning_1_mission):
                     if len(planning_1_mission[i][j])==0:
                         distance[i]+=0
                     else:
-                        distance[i] += DISTANCES[0][planning_1_mission[i][j][k]]
+                        distance[i] += MATRICE_DISTANCE[0][planning_1_mission[i][j][k]]
                 elif k==nbMissionsJournal:
                     if len(planning_1_mission[i][j])==0:
                         distance[i]+=0
                     else:
-                        distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][0]
+                        distance[i] += MATRICE_DISTANCE[planning_1_mission[i][j][k-1]][0]
                 else:
                     if len(planning_1_mission[i][j])==0:
                         distance[i]+=0
                     else:
-                        distance[i] += DISTANCES[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
+                        distance[i] += MATRICE_DISTANCE[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
     return distance
 
-def distance_employs_toutes_missions (solutions, DISTANCES,inter,mis):
-    distance_employe = []
-    for i in range(len(solutions)):
-        planning = activites_intervenants(solutions[i],inter,mis)
-        distance_employe.append(distance_employé(DISTANCES, planning))
-    return distance_employe
+
+def moyenne_toutes_distances(): #DISTANCES est une matrice carrée
+    somme = 0
+    for i in range(len(MATRICE_DISTANCE)):
+        somme += MATRICE_DISTANCE[i][0] + MATRICE_DISTANCE[0][i]
+    return somme / len(INTERVENANTS)
 
 
-def moyenne_toutes_distances(DISTANCES,inter): #DISTANCES est une matrice carrée
-    nbInter = len(inter)
-    nbMission = len(DISTANCES)
-    somme=0
-    for i in range(nbMission):
-        somme += DISTANCES[i][0]+DISTANCES[0][i]
-    return somme/nbInter
+def kapa():
+    return 100 / moyenne_toutes_distances()
 
+def zeta():
+    return 100 / sum([INTERVENANTS[i][3] for i in range(len(INTERVENANTS))])
 
-def kapa(DISTANCES,inter):
-    moy = moyenne_toutes_distances(DISTANCES, inter)
-    kapa = 100 / moy
-    return kapa
+def gamma():
+    return 10
 
-def gama(inter):
-    nbInter = len(inter)
-    sumHeureTrav = 0
-    for i in range(nbInter):
-        sumHeureTrav += inter[i][3]
-    gamma = 100 / sumHeureTrav
-    return gamma
-
-
-def fitnessEm(ecart_WH, ecart_OH, ecart_D, inter, DISTANCES): #Pour une seule solution
-    zeta = 10
-    ga=gama(inter)
-    kap = kapa(DISTANCES, inter)
-    fitness = (zeta * ecart_WH + ga * ecart_OH + kap * ecart_D) / 3
-    return fitness
+def fitnessEm(ecart_WH, ecart_OH, ecart_D):
+    return (zeta() * ecart_WH + gamma() * ecart_OH + kapa() * ecart_D) / 3
 
 
 def main():
-    charge_fichier_csv("45-4")
-    SOLUTIONS = charger_solution("TRUE_res.txt")
     print(SOLUTIONS[0])
-    nb_tra = nombre_heures_travaillée(MISSIONS, INTERVENANTS, SOLUTIONS[0])
-    nb_non_tra, nb_sup = nombre_heures_non_travaillée_et_sup(nb_tra, INTERVENANTS)
-    print(nb_tra)
-    print(nb_non_tra, nb_sup)
-    #print(activites_intervenants(SOLUTIONS[0]))
-    #print(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0])))
-    #print(ordre_mission(SOLUTIONS, MISSIONS, INTERVENANTS))
-    ecart_dis = st.pstdev(distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0], INTERVENANTS, MISSIONS)))
+    nb_tra, nb_non_tra, nb_sup = stats_heures(SOLUTIONS[0])
+    ecart_dis = st.pstdev(distance_employe(activites_intervenants(SOLUTIONS[0])))
     ecart_WH = st.pstdev(nb_non_tra)
     ecart_OH = st.pstdev(nb_sup)
-    #for k in range(len(ecart_WH)):
-    print(fitnessEm(ecart_WH, ecart_OH, ecart_dis, INTERVENANTS, MATRICE_DISTANCE))
+    print(fitnessEm(ecart_WH, ecart_OH, ecart_dis))
 
+# sorti du main pour pouvoir charger les variables lors de l'import du fichier et lors de l'execution du fichier
+# J'ai une technique de gitan pour pouvoir remplacer les arguments que j'implementerais plus tard
+charger_solution("TRUE_res.txt")
+charge_fichier_csv("45-4")
 
 if __name__ == "__main__":
     main()

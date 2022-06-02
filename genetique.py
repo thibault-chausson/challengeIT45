@@ -64,11 +64,10 @@ def charger_solution(dossier):
 
 
 def fitnessEmInitialisation(mission, inter, solution_1, distances):
-    nbTrav = fEm.nombre_heures_travaillée(mission, inter, solution_1)
-    nbNon, nbSup = fEm.nombre_heures_non_travaillée_et_sup(nbTrav, inter)
-    solution_1_planning = fEm.activites_intervenants(solution_1, inter, mission)
-    nbDis = fEm.distance_employé(distances, solution_1_planning)
-    fitnessEmplo_1_sol = fEm.fitnessEm(st.pstdev(nbNon), st.pstdev(nbSup), st.pstdev(nbDis), inter, distances)
+    nbTrav, nbNon, nbSup = fEm.stats_heures(solution_1)
+    solution_1_planning = fEm.activites_intervenants(solution_1)
+    nbDis = fEm.distance_employe(solution_1_planning)
+    fitnessEmplo_1_sol = fEm.fitnessEm(st.pstdev(nbNon), st.pstdev(nbSup), st.pstdev(nbDis))
     return fitnessEmplo_1_sol
 
 
@@ -163,12 +162,12 @@ def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
-    apres = genetique_employes(SOLUTIONS, 1000, 0.002, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0001)
+    apres = genetique_employes(SOLUTIONS, 1000, 0.05, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.01)
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
 
     indi, petit = mini(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE))
 
-    print(fEm.activites_intervenants(apres[indi], INTERVENANTS, MISSIONS))
+    print(fEm.activites_intervenants(apres[indi]))
 
 
 if __name__ == "__main__":
