@@ -227,7 +227,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
     tableau_fit_Se = choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances)
     while nbGene < nbGeneration:
         # On choisie les deux parents
-        parent1, parent2 = choixParentsPareto(tableau_fit_Et, tableau_fit_Se, tableau_fit_Em, solutions)
+        parent1, parent2 = choixParentsPareto(tableau_fit_Em, tableau_fit_Et, tableau_fit_Se, solutions)
         # On crée un enfant
         finCol = rd.randint(1, nbMis - 1)
         fille1 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
@@ -338,7 +338,7 @@ def main():
     print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS)))
-    apres = genetiquePareto(SOLUTIONS, 1000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
+    apres = genetiquePareto(SOLUTIONS, 10000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
     print("emplo apres")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
     print("SESSAD apres")
@@ -349,7 +349,6 @@ def main():
     #indi, petit = mini(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE))
 
     #print(fEm.activites_intervenants(apres[indi]))
-
 
 
 
