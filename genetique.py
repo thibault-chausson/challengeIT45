@@ -119,7 +119,7 @@ def choixFitness_tableau (fit, mission, intervenants, solutions, distances):
 
 
 
-def genetique_employes(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, type_fit):
+def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, type_fit):
     nbGene = 0
     nbPlanning = len(solutions)
     nbInter = len(intervenants)
@@ -191,9 +191,9 @@ def mini(tab):
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
-    apres = genetique_employes(SOLUTIONS, 1000, 0.05, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.01, "SESSAD")
-    print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
+    print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
+    apres = genetique(SOLUTIONS, 1000, 0.07, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.00, "SESSAD")
+    print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
 
     indi, petit = mini(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE))
 
