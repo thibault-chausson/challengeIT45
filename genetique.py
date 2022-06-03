@@ -2,7 +2,11 @@ import json as js
 import statistics as st
 import numpy as np
 import random as rd
+
 import fitnessEmployes as fEm
+import fitnessEtudiants as fEt
+import fitnessSESSAD as fS
+
 import tools as tls
 import functions as fct
 
@@ -89,12 +93,43 @@ def maxiFit(tableau):
     return indice, maxi
 
 
-def genetique_employes(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
+def choixFitness_1 (fit, mission, intervenants, fille, distances):
+    if fit=="etudiant":
+        return fEt.fitnessEtudiants_1(fille, mission, intervenants)
+    elif fit=="employe":
+        return fitnessEmInitialisation(mission, intervenants, fille, distances)
+    elif fit=="SESSAD":
+        dis1 = fEm.distance_employe(fS.activites_intervenants(fille))
+        return fS.fitnessSESSAD(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE, dis1)
+    else:
+        return "erreur"
+
+
+
+
+
+
+
+def choixFitness_tableau (fit, mission, intervenants, solutions, distances):
+    if fit=="etudiant":
+        return fEt.fitnessEtudiants_tout(solutions, mission,intervenants)
+    elif fit=="employe":
+        return tableau_fitnessEM(mission, intervenants, solutions, distances)
+    elif fit=="SESSAD":
+        return fS.fitnessSESSAD_tout(mission, intervenants, solutions, distances)
+    else:
+        return "erreur"
+
+
+
+
+
+def genetique_employes(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, type_fit):
     nbGene = 0
     nbPlanning = len(solutions)
     nbInter = len(intervenants)
     nbMis = len(mission)
-    tableau_fit = tableau_fitnessEM(mission, intervenants, solutions, distances)
+    tableau_fit = choixFitness_tableau(type_fit, mission, intervenants, solutions, distances)
     while nbGene < nbGeneration:
         # On choisie les deux parents
         parent1, parent2 = tls.choixParents(tableau_fit)
@@ -108,14 +143,15 @@ def genetique_employes(solutions, nbGeneration, probaMutation, distances, interv
         valideFille2 = fct.contraintes(fille2)
 
         if valideFille1:
-            fitnessFille1 = fitnessEmInitialisation(mission, intervenants, fille1, distances)
+            #fitnessFille1 = fitnessEmInitialisation(mission, intervenants, fille1, distances)
+            fitnessFille1 = choixFitness_1(type_fit, mission, intervenants, fille1, distances)
             indice, max = maxiFit(tableau_fit)
             if fitnessFille1 < max:
                 solutions[indice] = fille1
                 tableau_fit[indice] = fitnessFille1
 
         if valideFille2:
-            fitnessFille2 = fitnessEmInitialisation(mission, intervenants, fille2, distances)
+            fitnessFille2 = choixFitness_1(type_fit, mission, intervenants, fille2, distances)
             indice, max = maxiFit(tableau_fit)
             if fitnessFille2 < max:
                 solutions[indice] = fille2
@@ -126,14 +162,13 @@ def genetique_employes(solutions, nbGeneration, probaMutation, distances, interv
 
         if rd.random() < probaMutation:
             solutionChoisie = rd.randint(0, nbPlanning - 1)
-            fitnessChoisiePourMutation = fitnessEmInitialisation(mission, intervenants, solutions[solutionChoisie],
-                                                                 distances)
+            fitnessChoisiePourMutation = choixFitness_1(type_fit, mission, intervenants, solutions[solutionChoisie], distances)
             mutate = tls.mutation(solutions[solutionChoisie])
             valideMutate = fct.contraintes(mutate)
             if valideMutate:
                 empire = rd.random()
                 if empire > probaMissionEmpire:
-                    fitnessMutate = fitnessEmInitialisation(mission, intervenants, mutate, distances)
+                    fitnessMutate = choixFitness_1(type_fit, mission, intervenants, mutate, distances)
                     if fitnessMutate < fitnessChoisiePourMutation:
                         solutions[solutionChoisie] = mutate
                         tableau_fit[solutionChoisie] = fitnessMutate
@@ -162,7 +197,7 @@ def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
-    apres = genetique_employes(SOLUTIONS, 1000, 0.05, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.01)
+    apres = genetique_employes(SOLUTIONS, 1000, 0.05, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.01, "employe")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
 
     indi, petit = mini(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE))

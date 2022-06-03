@@ -104,15 +104,6 @@ def fitnessSESSAD(mission, inter, solution, DISTANCE, dist_1_Semaine):
     f = (bet * somme + kap * moyDis + kap * maxDis) / 3
     return f
 
-
-def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE, dist_1_Semaine):
-    nbSol = len(solutions)
-    fit = np.zeros(nbSol)
-    for i in range(nbSol):
-        fit[i] = fitnessSESSAD(mission, inter, solutions[i], DISTANCE, dist_1_Semaine)
-    return fit
-
-
 def activites_intervenants(solution):
     """
     Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
@@ -132,13 +123,22 @@ def activites_intervenants(solution):
 
     return miss_intervenants
 
+def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE):
+    nbSol = len(solutions)
+    fit = np.zeros(nbSol)
+    for i in range(nbSol):
+        dis1 = fE.distance_employe(activites_intervenants(solutions[i]))
+        fit[i] = fitnessSESSAD(mission, inter, solutions[i], DISTANCE, dis1)
+    return fit
+
+
+
 
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     # print(activites_intervenants(SOLUTIONS[0]))
-    dis1 = fE.distance_employé(MATRICE_DISTANCE, activites_intervenants(SOLUTIONS[0]))
-    print(fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE, dis1))
+    print(fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE))
 
 
 if __name__ == "__main__":
