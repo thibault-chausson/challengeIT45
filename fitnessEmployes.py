@@ -69,6 +69,7 @@ def stats_heures(solution):
     nb_heuresNonTravaille = np.zeros(inters)
     nb_heureSup = np.zeros(inters)
 
+
     for i in range(inters):
         for j in range(len(MISSIONS)):
             if solution[i][j] == 1:
@@ -86,7 +87,9 @@ def stats_heures(solution):
 
 
 """
-def nombre_heures_travaillee(missions, inter, solution_1_planning): #tableau des heures travaillées pour un planning (tableau pour chaque inter)
+def 
+
+(missions, inter, solution_1_planning): #tableau des heures travaillées pour un planning (tableau pour chaque inter)
     nbHeuresTravaille = np.zeros(len(inter))
     for j in range(len(inter)):
         for k in range(len(missions)):

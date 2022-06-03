@@ -61,9 +61,11 @@ def charger_solution(dossier):
 
 def sumWOH_1(mission, inter, solution):
     somme = 0
-    nbHeuresTrav = fE.nombre_heures_travaillée(mission, inter, solution)
-    nbNonTrav = (fE.nombre_heures_non_travaillée_et_sup(nbHeuresTrav, inter))[0]
-    for j in range(len(inter)):
+
+    nbTrav, nbNonTravvvv, nbSup = fE.stats_heures(solution)
+    nbHeuresTrav = nbTrav
+    nbNonTrav = nbNonTravvvv
+    for j in range(len(solution)):
         somme += nbNonTrav[j] + nbHeuresTrav[j]
     return (somme)
 
@@ -95,9 +97,9 @@ def maxDist(disEmploy):
     return maxi
 
 
-def fitnessSESSAD(mission, inter, solution, DISTANCE, dist_1_Semaine):
+def fitnessSESSAD(mission, inter, solution, dist_1_Semaine):
     somme = sumWOH_1(mission, inter, solution)
-    kap = fE.kapa(DISTANCE, inter)
+    kap = fE.kapa()
     bet = beta()
     moyDis = moyDist(dist_1_Semaine)
     maxDis = maxDist(dist_1_Semaine)
@@ -109,10 +111,10 @@ def activites_intervenants(solution):
     Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
     """
     miss_intervenants = []
-    for i in range(len(INTERVENANTS)):
+    for i in range(len(solution)):
         missions = {1: [], 2: [], 3: [], 4: [], 5: []}
         edt = {1: [], 2: [], 3: [], 4: [], 5: []}
-        for j in range(len(MISSIONS)):
+        for j in range(len(solution[0])):
             if solution[i][j] == 1:
                 missions[MISSIONS[j][1]].append((j, MISSIONS[j][2]))
         for jour in missions:
@@ -128,7 +130,7 @@ def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE):
     fit = np.zeros(nbSol)
     for i in range(nbSol):
         dis1 = fE.distance_employe(activites_intervenants(solutions[i]))
-        fit[i] = fitnessSESSAD(mission, inter, solutions[i], DISTANCE, dis1)
+        fit[i] = fitnessSESSAD(mission, inter, solutions[i], dis1)
     return fit
 
 
@@ -137,9 +139,14 @@ def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE):
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    # print(activites_intervenants(SOLUTIONS[0]))
+    #print(SOLUTIONS[0])
+    #print(activites_intervenants(SOLUTIONS[0]))
     print(fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE))
 
+# sorti du main pour pouvoir charger les variables lors de l'import du fichier et lors de l'execution du fichier
+# J'ai une technique de gitan pour pouvoir remplacer les arguments que j'implementerais plus tard
+charger_solution("TRUE_res.txt")
+charge_fichier_csv("45-4")
 
 if __name__ == "__main__":
     main()

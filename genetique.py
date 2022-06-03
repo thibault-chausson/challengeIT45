@@ -100,14 +100,9 @@ def choixFitness_1 (fit, mission, intervenants, fille, distances):
         return fitnessEmInitialisation(mission, intervenants, fille, distances)
     elif fit=="SESSAD":
         dis1 = fEm.distance_employe(fS.activites_intervenants(fille))
-        return fS.fitnessSESSAD(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE, dis1)
+        return fS.fitnessSESSAD(mission, intervenants, fille, dis1)
     else:
         return "erreur"
-
-
-
-
-
 
 
 def choixFitness_tableau (fit, mission, intervenants, solutions, distances):
@@ -197,7 +192,7 @@ def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
-    apres = genetique_employes(SOLUTIONS, 1000, 0.05, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.01, "employe")
+    apres = genetique_employes(SOLUTIONS, 1000, 0.05, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.01, "SESSAD")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
 
     indi, petit = mini(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE))
