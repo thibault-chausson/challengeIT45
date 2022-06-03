@@ -122,7 +122,7 @@ def evolutionFit(deb, nbPopMax, pas,type):
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    deb, nbPopMax, pas = 10, 250, 2
+    deb, nbPopMax, pas = 10, 50, 2
     x, y = evolutionFit(deb, nbPopMax, pas,"etudiant")
 
 
