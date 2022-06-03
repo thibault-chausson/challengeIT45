@@ -2,7 +2,6 @@ import genetique as gene
 import fitnessSESSAD as fS
 import time as ti
 
-
 import json as js
 import numpy as np
 import fitnessEmployes as fE
@@ -59,7 +58,6 @@ def charge_fichier_csv(dossier):
     return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
 
 
-
 def charger_solution(dossier):
     with open(f"./{dossier}", 'r') as f:
         fich = f.read().split('\n\n')[:-1]
@@ -67,22 +65,17 @@ def charger_solution(dossier):
     return SOLUTIONS
 
 
-
-
-
-
-
 def duree(deb, nbPopMax, pas):
     sol = charger_solution("TRUE_res.txt")
-    temps=[0]
-    x=[0]
-    indice=0
+    temps = [0]
+    x = [0]
+    indice = 0
     debut = ti.time()
-    for i in range(deb, nbPopMax+pas, pas):
+    for i in range(deb, nbPopMax + pas, pas):
         sol = gene.genetique(sol, i, 0.07, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.00, "employe")
         fin = ti.time()
-        x.append(x[indice]+i)
-        indice+=1
+        x.append(x[indice] + i)
+        indice += 1
         temps.append(fin - debut)
 
     plt.plot(x, temps)
@@ -94,18 +87,17 @@ def duree(deb, nbPopMax, pas):
     return x, temps
 
 
-
-def evolutionFit(deb, nbPopMax, pas,type):
+def evolutionFit(deb, nbPopMax, pas, type):
     sol = charger_solution("TRUE_res.txt")
-    fit=[min(gene.choixFitness_tableau(type, MISSIONS, INTERVENANTS, sol, MATRICE_DISTANCE))]
-    x=[0]
-    indice=0
-    for i in range(deb, nbPopMax+pas, pas):
+    fit = [min(gene.choixFitness_tableau(type, MISSIONS, INTERVENANTS, sol, MATRICE_DISTANCE))]
+    x = [0]
+    indice = 0
+    for i in range(deb, nbPopMax + pas, pas):
         sol = gene.genetique(sol, i, 0.07, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.00, type)
         finFit = min(gene.choixFitness_tableau(type, MISSIONS, INTERVENANTS, sol, MATRICE_DISTANCE))
-        fit.append( finFit)
-        x.append(x[indice]+i)
-        indice+=1
+        fit.append(finFit)
+        x.append(x[indice] + i)
+        indice += 1
 
     plt.plot(x, fit)
     plt.xlabel("Générations")
@@ -116,20 +108,14 @@ def evolutionFit(deb, nbPopMax, pas,type):
     return x, fit
 
 
-
 def nbSolutionnn(deb, nbPopMax, pas):
-
-    x=[0]
-    indice=0
-    for i in range(deb, nbPopMax+pas, pas):
-        x.append(x[indice]+i)
-        indice+=1
-
-
+    x = [0]
+    indice = 0
+    for i in range(deb, nbPopMax + pas, pas):
+        x.append(x[indice] + i)
+        indice += 1
 
     return x[-1]
-
-
 
 
 def main():
@@ -138,13 +124,6 @@ def main():
     deb, nbPopMax, pas = 10, 230, 2
     print(nbSolutionnn(deb, nbPopMax, pas))
     x, y = duree(deb, nbPopMax, pas)
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
