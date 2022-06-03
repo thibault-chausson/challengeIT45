@@ -10,6 +10,8 @@ import fitnessSESSAD as fS
 import tools as tls
 import functions as fct
 
+import copy as cp
+
 MATRICE_DISTANCE = []
 INTERVENANTS = []
 MISSIONS = []
@@ -188,11 +190,19 @@ def mini(tab):
     return indice, mini
 
 
+def genetiqueMulti(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
+    sol=cp.deepcopy(solutions)
+    sol1=genetique(sol, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "employe")
+    sol2=genetique(sol, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "etudiant")
+    sol3=genetique(sol, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "SESSAD")
+    return sol
+
+
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
-    apres = genetique(SOLUTIONS, 1000, 0.07, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.00, "SESSAD")
+    print(fEt.fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS))
+    apres = genetique(SOLUTIONS, 400, 0.07, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.00, "SESSAD")
     print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
 
     indi, petit = mini(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE))
