@@ -58,50 +58,59 @@ def charger_solution(dossier):
     return SOLUTIONS
 
 
-def alpha(SOLUTIONS):
+def alpha(mission):
     """
     Retourne le coefficient alpha de la fonction de cout
     """
-    nbMiss = len(SOLUTIONS[0][0])
+    nbMiss = len(mission)
     alpha = 100 / nbMiss
     return alpha
 
 
-def penalite(SOLUTIONS, MISSION, INTERVENANT):
+def penalite_1(solution, MISSION, INTERVENANT):
     """
     Retourne la penalite de la solution
     """
     nbMiss = len(MISSION)
     nbInter = len(INTERVENANT)
-    nbSol = len(SOLUTIONS)
-    penalite = np.zeros(nbSol)
-    for k in range(nbSol):
-        for i in range(nbInter):
-            for j in range(nbMiss):
-                if SOLUTIONS[k][i][j] == 1:
-                    if MISSION[j][5] != INTERVENANT[i][2]:
-                        penalite[k] += 1
+    penalite = 0
+    for i in range(nbInter):
+        for j in range(nbMiss):
+            if solution[i][j] == 1:
+                if MISSION[j][5] != INTERVENANT[i][2]:
+                    penalite += 1
     return penalite
 
+def penalite_toutes_solution(SOLUTIONS, MISSION,INTERVENANT):
+    nbSol= len(SOLUTIONS)
+    pen=np.zeros(nbSol)
+    for i in range (nbSol):
+        pen[i]=penalite_1(SOLUTIONS[i],MISSION,INTERVENANT)
+    return pen
 
-def fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS):
+
+def fitnessEtudiants_1(solution, MISSIONS, INTERVENANTS):
     """
     Retourne le fitness de chaque solution
     """
-    al = alpha(SOLUTIONS)
-    pe = penalite(SOLUTIONS, MISSIONS, INTERVENANTS)
-    nbSol = len(SOLUTIONS)
-    fitness = np.zeros(nbSol)
-    for i in range(nbSol):
-        fitness[i] = al * pe[i]
+    al = alpha(MISSIONS)
+    pe = penalite_1(solution, MISSIONS, INTERVENANTS)
+    fitness = al * pe
     return fitness
+
+def fitnessEtudiants_tout(SOLUTIONS, MISSIONS,INTERVENANTS):
+    nbSol=len(SOLUTIONS)
+    fit=np.zeros(nbSol)
+    for i in range(nbSol):
+        fit[i]=fitnessEtudiants_1(SOLUTIONS[i],MISSIONS,INTERVENANTS)
+    return fit
 
 
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     #print(SOLUTIONS[0])
-    print(fitnessEtudiants(SOLUTIONS, MISSIONS, INTERVENANTS))
+    print(fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS))
 
 
 if __name__ == "__main__":
