@@ -14,6 +14,8 @@ import copy as cp
 
 import paretoFront as pf
 
+import time as ti
+
 MATRICE_DISTANCE = []
 INTERVENANTS = []
 MISSIONS = []
@@ -338,13 +340,17 @@ def main():
     print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS)))
-    apres = genetiquePareto(SOLUTIONS, 10000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
+    debut = ti.time()
+    apres = genetiquePareto(SOLUTIONS, 1000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
+    fin=ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
     print("SESSAD apres")
     print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
     print("etudiant apres")
     print(min(fEt.fitnessEtudiants_tout(apres, MISSIONS, INTERVENANTS)))
+    print("temps")
+    print(fin-debut)
 
     #indi, petit = mini(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE))
 

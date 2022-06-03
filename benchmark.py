@@ -117,13 +117,27 @@ def evolutionFit(deb, nbPopMax, pas,type):
 
 
 
+def nbSolutionnn(deb, nbPopMax, pas):
+
+    x=[0]
+    indice=0
+    for i in range(deb, nbPopMax+pas, pas):
+        x.append(x[indice]+i)
+        indice+=1
+
+
+
+    return x[-1]
+
+
 
 
 def main():
     charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
-    deb, nbPopMax, pas = 10, 50, 2
-    x, y = evolutionFit(deb, nbPopMax, pas,"etudiant")
+    deb, nbPopMax, pas = 10, 230, 2
+    print(nbSolutionnn(deb, nbPopMax, pas))
+    x, y = duree(deb, nbPopMax, pas)
 
 
 
