@@ -74,6 +74,9 @@ def charger_solution(dossier):
 
 
 def fitnessEmInitialisation(mission, inter, solution_1, distances):
+    """
+    Fonction qui initialise la fitness employé pour une solution
+    """
     nbTrav, nbNon, nbSup = fEm.stats_heures(solution_1)
     solution_1_planning = fEm.activites_intervenants(solution_1)
     nbDis = fEm.distance_employe(solution_1_planning)
@@ -82,6 +85,9 @@ def fitnessEmInitialisation(mission, inter, solution_1, distances):
 
 
 def tableau_fitnessEM(mission, inter, solution, distances):
+    """
+    Fonction qui calcule la fitness employé pour toutes les solutions
+    """
     nbSol = len(solution)
     tableau = np.zeros(nbSol)
     for i in range(nbSol):
@@ -90,6 +96,9 @@ def tableau_fitnessEM(mission, inter, solution, distances):
 
 
 def maxiFit(tableau):
+    """
+    Fonction qui renvoie la pire fitness d'un tableau et son indice
+    """
     indice = 0
     maxi = tableau[0]
     for i in range(len(tableau)):
@@ -100,6 +109,9 @@ def maxiFit(tableau):
 
 
 def choixFitness_1 (fit, mission, intervenants, fille, distances):
+    """
+    Fonction qui renvoie la fitness d'une solution dont on a explicitement demandé le type de fitness
+    """
     if fit=="etudiant":
         return fEt.fitnessEtudiants_1(fille, mission, intervenants)
     elif fit=="employe":
@@ -112,6 +124,9 @@ def choixFitness_1 (fit, mission, intervenants, fille, distances):
 
 
 def choixFitness_tableau (fit, mission, intervenants, solutions, distances):
+    """
+    Fonction qui renvoie la fitness de la population dont on a explicitement demandé le type de fitness
+    """
     if fit=="etudiant":
         return fEt.fitnessEtudiants_tout(solutions, mission,intervenants)
     elif fit=="employe":
@@ -126,6 +141,9 @@ def choixFitness_tableau (fit, mission, intervenants, solutions, distances):
 
 
 def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, type_fit):
+
+    #Initialisation de la population
+
     nbGene = 0
     nbPlanning = len(solutions)
     nbInter = len(intervenants)
@@ -138,13 +156,13 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
         finCol = rd.randint(1, nbMis - 1)
         fille1 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
         fille2 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, finCol, nbMis - 1)
-        # On choisie ce que l'on va faire avec les enfants
+        # On choisie ce que l'on va faire avec les enfants, s'il est valide ou non
 
         valideFille1 = fct.contraintes(fille1)
         valideFille2 = fct.contraintes(fille2)
 
         if valideFille1:
-            #fitnessFille1 = fitnessEmInitialisation(mission, intervenants, fille1, distances)
+            # Si l'enfant est valide on remplace le pire de la population par l'enfant
             fitnessFille1 = choixFitness_1(type_fit, mission, intervenants, fille1, distances)
             indice, max = maxiFit(tableau_fit)
             if fitnessFille1 < max:
@@ -152,6 +170,7 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
                 tableau_fit[indice] = fitnessFille1
 
         if valideFille2:
+            # Si l'enfant est valide on remplace le pire de la population par l'enfant
             fitnessFille2 = choixFitness_1(type_fit, mission, intervenants, fille2, distances)
             indice, max = maxiFit(tableau_fit)
             if fitnessFille2 < max:
@@ -162,18 +181,22 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
         # On choisit une solution
 
         if rd.random() < probaMutation:
+            # On choisit de faire une mutation
             solutionChoisie = rd.randint(0, nbPlanning - 1)
             fitnessChoisiePourMutation = choixFitness_1(type_fit, mission, intervenants, solutions[solutionChoisie], distances)
             mutate = tls.mutation(solutions[solutionChoisie])
             valideMutate = fct.contraintes(mutate)
             if valideMutate:
+                # Si la mutation est valide
                 empire = rd.random()
                 fitnessMutate = choixFitness_1(type_fit, mission, intervenants, mutate, distances)
                 if empire > probaMissionEmpire:
+                    # Si elle améliore le fitness de la solution choisie on met à jour la solution
                     if fitnessMutate < fitnessChoisiePourMutation:
                         solutions[solutionChoisie] = mutate
                         tableau_fit[solutionChoisie] = fitnessMutate
                 else:
+                    # Si elle n'améliore pas le fitness de la solution choisie on met à jour seulement si on a le droit d'empirer la solution
                     solutions[solutionChoisie] = mutate
                     tableau_fit[solutionChoisie] = fitnessMutate
 
@@ -196,6 +219,9 @@ def mini(tab):
 
 
 def genetiqueCascade(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
+    """
+    Algorithme génétique en cascade
+    """
     sol=cp.deepcopy(solutions)
     sol1=genetique(sol, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "employe")
     sol2=genetique(sol1, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "etudiant")
@@ -205,6 +231,9 @@ def genetiqueCascade(solutions, nbGeneration, probaMutation, distances, interven
 
 
 def choixParentsPareto(tableau_fit1, tableau_fit2, tableau_fit3, solutions):
+    """
+    On execute le font de Pareto et on choisit les parents dans ce front
+    """
     x, y, z, sol = pf.pareto_frontier(tableau_fit1, tableau_fit2, tableau_fit3, minX = False, minY = True, minZ = True)
     if len(sol)==1 or len(sol)==0:
         nbSolution = len(solutions)
@@ -247,6 +276,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
             indice_Em, max_Em = maxiFit(tableau_fit_Em)
             indice_Et, max_Et = maxiFit(tableau_fit_Et)
             indice_SE, max_SE = maxiFit(tableau_fit_Se)
+            # Si l'enfant est meilleur toutes les fitness on choisit une fitness au hasard et on concerve l'enfant
             if fitnessFille1_EM < max_Em or fitnessFille1_Et < max_Et or fitnessFille1_SE < max_SE:
                 ran1=rd.randint(1,3)
                 if ran1==1:
@@ -274,6 +304,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
             indice2_Em, max2_Em = maxiFit(tableau_fit_Em)
             indice2_Et, max2_Et = maxiFit(tableau_fit_Et)
             indice2_SE, max2_SE = maxiFit(tableau_fit_Se)
+            # Si l'enfant est meilleur toutes les fitness on choisit une fitness au hasard et on concerve l'enfant
             if fitnessFille2_EM < max2_Em and fitnessFille2_Et < max2_Et and fitnessFille2_SE < max2_SE:
                 ran=rd.randint(1,3)
                 if ran==1:
@@ -304,6 +335,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
             fitnessChoisiePourMutation_SE = choixFitness_1("SESSAD", mission, intervenants, solutions[solutionChoisie], distances)
             mutate = tls.mutation(solutions[solutionChoisie])
             valideMutate = fct.contraintes(mutate)
+            # Le mutant fonctionne comme dans n'importe quel algo génétique
             if valideMutate:
                 empire = rd.random()
                 fitnessMutate_Em = choixFitness_1("employe", mission, intervenants, mutate, distances)

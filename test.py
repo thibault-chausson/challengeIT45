@@ -1,3 +1,9 @@
+"""
+Document boubelle pour réaliser des testes
+"""
+
+
+
 '''
 Method to take three equally-sized lists and return just the elements which lie
 on the Pareto frontier, sorted into order.

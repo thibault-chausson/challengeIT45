@@ -60,6 +60,9 @@ def charger_solution(dossier):
 
 
 def sumWOH_1(mission, inter, solution):
+    """
+    Renvoie la somme des WOH (heures non travaillées) des missions effectues par chaque intervenant
+    """
     somme = 0
 
     nbTrav, nbNonTravvvv, nbSup = fE.stats_heures(solution)
@@ -79,10 +82,16 @@ def sumWOH_tous(mission, inter, solutions):
 
 
 def beta():
+    """
+    Renvoie la valeur de beta
+    """
     return 100 / 45
 
 
 def moyDist(disEmploy):
+    """
+    Renvoie la moyenne des distances effectuées par les employes
+    """
     moy = 0
     for i in range(len(disEmploy)):
         moy += disEmploy[i]
@@ -90,6 +99,9 @@ def moyDist(disEmploy):
 
 
 def maxDist(disEmploy):
+    """
+    Renvoie la distance maximale effectuée par les employes (la distance la plus grande réalisée par 1 employé)
+    """
     maxi = 0
     for i in range(len(disEmploy)):
         if disEmploy[i] > maxi:
@@ -98,6 +110,9 @@ def maxDist(disEmploy):
 
 
 def fitnessSESSAD(mission, inter, solution, dist_1_Semaine):
+    """
+    Renvoie la fitness SESSAD pour une solution solution
+    """
     somme = sumWOH_1(mission, inter, solution)
     kap = fE.kapa()
     bet = beta()
@@ -126,6 +141,9 @@ def activites_intervenants(solution):
     return miss_intervenants
 
 def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE):
+    """
+    Renvoie la fitness SESSAD pour toutes les solutions
+    """
     nbSol = len(solutions)
     fit = np.zeros(nbSol)
     for i in range(nbSol):

@@ -66,6 +66,11 @@ def charger_solution(dossier):
 
 
 def duree(deb, nbPopMax, pas):
+    """
+    Fonction qui permet de calculer le temps d'exécution de X générations
+    A chaque tour dans la boucle for on reprend la solution précédente et ainsi on évite de repartir du début
+    On renvoit le temps d'exécution de la génération de X générations en secondes dans un tableau
+    """
     sol = charger_solution("TRUE_res.txt")
     temps = [0]
     x = [0]
@@ -88,6 +93,11 @@ def duree(deb, nbPopMax, pas):
 
 
 def evolutionFit(deb, nbPopMax, pas, type):
+    """
+    Fonction qui permet de calculer l'évolution de la fitness des générations
+    A chaque tour dans la boucle for on reprend la solution précédente et ainsi on évite de repartir du début
+    On renvoit la fitness de la génération de X générations dans un tableau
+    """
     sol = charger_solution("TRUE_res.txt")
     fit = [min(gene.choixFitness_tableau(type, MISSIONS, INTERVENANTS, sol, MATRICE_DISTANCE))]
     x = [0]
@@ -109,6 +119,9 @@ def evolutionFit(deb, nbPopMax, pas, type):
 
 
 def nbSolutionnn(deb, nbPopMax, pas):
+    """
+    Fonction qui permet de calculer le nombre de génération en donnant le nombre minimal de génération, le pas entre chaque génération
+    """
     x = [0]
     indice = 0
     for i in range(deb, nbPopMax + pas, pas):

@@ -149,6 +149,11 @@ def activites_intervenants(solution):
 
 
 def distance_employe(planning_1_mission):
+    """
+    Renvoie la distance effectuée par les employés
+    Prend en argument un planning (tableau de tableaux de missions classé par jour et par intervenant)
+    Retourne un tableau des distances par semaine pour chaque employé
+    """
     nbInter = len(planning_1_mission)
     nbJour = len(planning_1_mission[0])
     distance = np.zeros(nbInter) #distance par semaine pour un intervenant
@@ -175,6 +180,9 @@ def distance_employe(planning_1_mission):
 
 
 def moyenne_toutes_distances(): #DISTANCES est une matrice carrée
+    """
+    Renvoie la moyenne de toutes les distances entre le centre et les étudiants, et entre les étudiants et le centre
+    """
     somme = 0
     for i in range(len(MATRICE_DISTANCE)):
         somme += MATRICE_DISTANCE[i][0] + MATRICE_DISTANCE[0][i]
@@ -182,15 +190,27 @@ def moyenne_toutes_distances(): #DISTANCES est une matrice carrée
 
 
 def kapa():
+    """
+    Renvoie la valeur de kapa
+    """
     return 100 / moyenne_toutes_distances()
 
 def zeta():
+    """
+    Renvoie la valeur de zeta
+    """
     return 100 / sum([INTERVENANTS[i][3] for i in range(len(INTERVENANTS))])
 
 def gamma():
+    """
+    Renvoie la valeur de gamma
+    """
     return 10
 
 def fitnessEm(ecart_WH, ecart_OH, ecart_D):
+    """
+    Renvoie la valeur de la fonction de fitness pour les employés
+    """
     return (zeta() * ecart_WH + gamma() * ecart_OH + kapa() * ecart_D) / 3
 
 

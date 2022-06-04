@@ -65,7 +65,7 @@ def charger_solution(dossier):
 
 
 
-
+"""VALEURS TEST"""
 
 exempleFitness = [[12, 98, 56, 9, 152, 64, 567, 74, 989],
                   [12, 98, 56, 9, 152, 64, 567, 74, 989],
@@ -85,6 +85,9 @@ exempleFitness2 = [[112, 198, 156, 119, 1152, 164, 1567, 174, 1989],
                    ]
 
 def choixParents(fitness): #fonction qui choisit les parents à partir de leur fitness (decroissante) et renvoie les indices des parents
+    """
+    Choix par roulette des parents
+    """
     nbSol = len(fitness)
     ponde = np.zeros(nbSol)
     aux = np.zeros(nbSol)
@@ -114,6 +117,9 @@ def reproduction (solution1, solution2, ligDebut, ligFin, colDebut, colFin): #fo
     return fille
 
 def tri_langage(Mission):
+    """
+    Tri les missions par le langage des étudiants
+    """
     LPC = []
     LSF= []
     for i in range(len(Mission)):

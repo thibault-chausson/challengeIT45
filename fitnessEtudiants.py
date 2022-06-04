@@ -82,6 +82,9 @@ def penalite_1(solution, MISSION, INTERVENANT):
     return penalite
 
 def penalite_toutes_solution(SOLUTIONS, MISSION,INTERVENANT):
+    """
+    Retourne la penalite de chaque solution, en utilisant la fonction penalite_1 qui calcule la pénalité d'une solution
+    """
     nbSol= len(SOLUTIONS)
     pen=np.zeros(nbSol)
     for i in range (nbSol):
@@ -91,7 +94,7 @@ def penalite_toutes_solution(SOLUTIONS, MISSION,INTERVENANT):
 
 def fitnessEtudiants_1(solution, MISSIONS, INTERVENANTS):
     """
-    Retourne le fitness de chaque solution
+    Retourne le fitness d'un solution
     """
     al = alpha(MISSIONS)
     pe = penalite_1(solution, MISSIONS, INTERVENANTS)
@@ -99,6 +102,9 @@ def fitnessEtudiants_1(solution, MISSIONS, INTERVENANTS):
     return fitness
 
 def fitnessEtudiants_tout(SOLUTIONS, MISSIONS,INTERVENANTS):
+    """
+    Retourne le fitness de chaque solution pour les étudiants
+    """
     nbSol=len(SOLUTIONS)
     fit=np.zeros(nbSol)
     for i in range(nbSol):
