@@ -1,10 +1,13 @@
 import random
-from sol_initiale import *
 import json
+import numpy as np
+import copy
+
 
 MATRICE_DISTANCE = []
 INTERVENANTS = []
 MISSIONS = []
+SOLUTIONS = []
 
 def charge_fichier_csv(dossier):
     """
@@ -48,7 +51,28 @@ def charge_fichier_csv(dossier):
 
     return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
 
+def stats_heures(solution):
+    """
+    Renvoies des informations sur le nombre d'heures travaillées par les intervenants
+    """
+    inters = len(INTERVENANTS)
+    nb_heuresTravaille = np.zeros(inters)
+    nb_heuresNonTravaille = np.zeros(inters)
+    nb_heureSup = np.zeros(inters)
+
+    for i in range(inters):
+        for j in range(len(MISSIONS)):
+            if solution[i][j] == 1:
+                nb_heuresTravaille[i] += (MISSIONS[j][3] - MISSIONS[j][2]) / 60
+
+        tps = nb_heuresTravaille[i] - INTERVENANTS[i][3]
+        if tps < 0:
+            nb_heuresNonTravaille[i] += abs(tps)
+        else:
+            nb_heureSup[i] = abs(tps)
     
+    return nb_heuresTravaille, nb_heuresNonTravaille, nb_heureSup
+
 
 def contraintes(solution):
     """
@@ -167,9 +191,10 @@ def contraintes(solution):
 def read_sols(fichier):
     with open("TRUE_res.txt", 'r') as f:
         fich = f.read().split('\n\n')[:-1]
-    solutions = [json.loads(i) for i in fich]
+    for i in fich:
+        SOLUTIONS.append(json.loads(i))
 
-    return solutions
+    return SOLUTIONS
 
 
 def activites_intervenants(solution):
@@ -193,34 +218,62 @@ def activites_intervenants(solution):
     return miss_intervenants
 
 
+def choixParents(fitness): #fonction qui choisit les parents à partir de leur fitness (decroissante) et renvoie les indices des parents
+    """
+    Choix par roulette des parents
+    """
+    nbSol = len(fitness)
+    ponde = np.zeros(nbSol)
+    aux = np.zeros(nbSol)
+    for i in range(nbSol):
+        aux[i] = 1 / fitness[i]
+    for i in range(nbSol):
+        ponde[i] = (aux[i] / np.sum(aux))
+    Parent1 = random.choices(range(nbSol), weights=ponde, k=1)
+    ponde[Parent1[0]] = 0
+    Parent2 = random.choices(range(nbSol), weights=ponde, k=1)
+    return (Parent1[0], Parent2[0])
 
-def main():
-    alors = int(input("Choisissez parmis les options suivantes :\n1: 45-4\n2: 96-6\n3: 100-10\nchoix: "))
 
-    if alors == 1:
-        charge_fichier_csv("45-4")
-    elif alors == 2:
-        charge_fichier_csv("96-6")
-    elif alors == 3:
-        charge_fichier_csv("100-10")
-    else:
-        print("Erreur de saisie, fin du programme.")
-        return
 
-    #sol = nouvelle_solution()
 
-    solutions = read_sols("TRUE_res.txt")
-    compteur, good = (0, 0)
-    for i in solutions:
-        compteur +=1
-        if contraintes(i):
-            good+=1
-    print(good, compteur)
-    solution = cree_vrai_aleatoire(INTERVENANTS, MISSIONS)
-    #contraintes(solution)
+def reproduction(solution1, solution2, ligDebut, ligFin, colDebut, colFin): #fonction qui realise la reproduction entre deux solutions
+    """
+    Retourne la solution fille
+    Attention : la ligne de fin et col de fin a eu un +1 pour palier au range qui fait -1
+    """
+    nblig = len(solution1)
+    nbcol = len(solution1[0])
+    fille = copy.deepcopy(solution1)
+    for i in range(ligDebut, ligFin+1):
+        for j in range(colDebut, colFin+1):
+            fille[i][j] = solution2[i][j]
+    return fille
 
-    
-if __name__ == "__main__":
-    main()
 
-# idées: faire les croisements uniquement entre intervenants de la meme compétence.
+def tri_langage(Mission):
+    """
+    Tri les missions par le langage des étudiants
+    """
+    LPC = []
+    LSF= []
+    for i in range(len(Mission)):
+        if Mission[i][4] == "LPC":
+            LPC.append(Mission[i])
+        else:
+            LSF.append(Mission[i])
+    return LPC, LSF
+
+
+def mutation(solution):
+    """
+    Retourne la solution mutée
+    """
+    nblig = len(solution)
+    nbcol = len(solution[0])
+    rdLine1 = random.randint(0, nblig-1)
+    rdCol = random.randint(0, nbcol-1)
+    rdLine2 = random.randint(0, nblig-1)
+    (solution[rdLine1][rdCol], solution[rdLine2][rdCol]) = (solution[rdLine2][rdCol], solution[rdLine1][rdCol])
+    return solution
+

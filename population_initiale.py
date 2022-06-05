@@ -3,7 +3,6 @@ from functions import *
 import time
 import matplotlib.pyplot as plt
 
-MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv("100-10")
 
 def contrainte2(solution):
     # 2.  Une mission ne peut etre assignee qu’a un intervenant ayant la meme competence (LSF ou LPC)
@@ -161,12 +160,12 @@ def gen_n_solutions_uniques(n):
             if i not in toutes_les_solutions:
                 toutes_les_solutions.append(i)
     
+    print("Population initiale générée")
     return toutes_les_solutions[:n]
 
 
 
 def main():
-
     start_time = time.time()
     solutions = gen_n_solutions_uniques(50)
     print("Temps d'execution: {} secondes pour {} solutions".format(time.time() - start_time, len(solutions)))
@@ -177,4 +176,7 @@ def main():
 
 
 if __name__ == "__main__":
+    # variables globales à CE programme, pas lors de l'import
+    read_sols("TRUE_res.txt")
+    charge_fichier_csv("100-10")
     main()

@@ -1,3 +1,5 @@
+from functions import * # EXTREMEMENT IMPORTANT CAR CELA IMPORTE LES VARIABLES GLOBALES
+
 import json as js
 import statistics as st
 import numpy as np
@@ -7,78 +9,20 @@ import fitnessEmployes as fEm
 import fitnessEtudiants as fEt
 import fitnessSESSAD as fS
 
-import tools as tls
-import functions as fct
-
 import copy as cp
 
 import paretoFront as pf
 
 import time as ti
 
-MATRICE_DISTANCE = []
-INTERVENANTS = []
-MISSIONS = []
-
-SOLUTIONS = []  # Les lignes representent les formateurs (interfaces) et les colones les missions
-
-
-def charge_fichier_csv(dossier):
-    """
-    Charge le contenue du fichier csv dans les variables globales
-    """
-    with open(f"Instances/{dossier}/Distances.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MATRICE_DISTANCE.append(list(map(float, ligne.split(','))))
-
-    with open(f"Instances/{dossier}/Intervenants.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            INTERVENANTS.append(ligne.split(','))
-
-    with open(f"Instances/{dossier}/Missions.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MISSIONS.append(ligne.split(','))
-
-    # Changements des chiffres de types str en type int
-    for i in range(len(INTERVENANTS)):
-        for j in range(len(INTERVENANTS[i])):
-            try:
-                INTERVENANTS[i][j] = int(INTERVENANTS[i][j])
-            except:
-                pass
-
-    for i in range(len(MISSIONS)):
-        for j in range(len(MISSIONS[i])):
-            try:
-                MISSIONS[i][j] = int(MISSIONS[i][j])
-            except:
-                pass
-
-    return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
-
-
-def charger_solution(dossier):
-    with open(f"./{dossier}", 'r') as f:
-        fich = f.read().split('\n\n')[:-1]
-    SOLUTIONS = [js.loads(i) for i in fich]
-    return SOLUTIONS
 
 
 def fitnessEmInitialisation(mission, inter, solution_1, distances):
     """
     Fonction qui initialise la fitness employé pour une solution
     """
-    nbTrav, nbNon, nbSup = fEm.stats_heures(solution_1)
-    solution_1_planning = fEm.activites_intervenants(solution_1)
+    nbTrav, nbNon, nbSup = stats_heures(solution_1)
+    solution_1_planning = activites_intervenants(solution_1)
     nbDis = fEm.distance_employe(solution_1_planning)
     fitnessEmplo_1_sol = fEm.fitnessEm(st.pstdev(nbNon), st.pstdev(nbSup), st.pstdev(nbDis))
     return fitnessEmplo_1_sol
@@ -108,25 +52,26 @@ def maxiFit(tableau):
     return indice, maxi
 
 
-def choixFitness_1 (fit, mission, intervenants, fille, distances):
+def choixFitness_1(fit, mission, intervenants, fille, distances):
     """
     Fonction qui renvoie la fitness d'une solution dont on a explicitement demandé le type de fitness
     """
-    if fit=="etudiant":
+    if fit == "etudiant":
         return fEt.fitnessEtudiants_1(fille, mission, intervenants)
-    elif fit=="employe":
+    elif fit == "employe":
         return fitnessEmInitialisation(mission, intervenants, fille, distances)
-    elif fit=="SESSAD":
+    elif fit == "SESSAD":
         dis1 = fEm.distance_employe(fS.activites_intervenants(fille))
         return fS.fitnessSESSAD(mission, intervenants, fille, dis1)
     else:
         return "erreur"
 
 
-def choixFitness_tableau (fit, mission, intervenants, solutions, distances):
+def choixFitness_tableau(fit, mission, intervenants, solutions, distances):
     """
     Fonction qui renvoie la fitness de la population dont on a explicitement demandé le type de fitness
     """
+
     if fit=="etudiant":
         return fEt.fitnessEtudiants_tout(solutions, mission,intervenants)
     elif fit=="employe":
@@ -150,16 +95,17 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
     nbMis = len(mission)
     tableau_fit = choixFitness_tableau(type_fit, mission, intervenants, solutions, distances)
     while nbGene < nbGeneration:
+        print(f"nbGene: {nbGene}      nbGeneration: {nbGeneration}")
         # On choisie les deux parents
-        parent1, parent2 = tls.choixParents(tableau_fit)
+        parent1, parent2 = choixParents(tableau_fit)
         # On crée un enfant
         finCol = rd.randint(1, nbMis - 1)
-        fille1 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
-        fille2 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, finCol, nbMis - 1)
+        fille1 = reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
+        fille2 = reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, finCol, nbMis - 1)
         # On choisie ce que l'on va faire avec les enfants, s'il est valide ou non
 
-        valideFille1 = fct.contraintes(fille1)
-        valideFille2 = fct.contraintes(fille2)
+        valideFille1 = contraintes(fille1)
+        valideFille2 = contraintes(fille2)
 
         if valideFille1:
             # Si l'enfant est valide on remplace le pire de la population par l'enfant
@@ -184,8 +130,8 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
             # On choisit de faire une mutation
             solutionChoisie = rd.randint(0, nbPlanning - 1)
             fitnessChoisiePourMutation = choixFitness_1(type_fit, mission, intervenants, solutions[solutionChoisie], distances)
-            mutate = tls.mutation(solutions[solutionChoisie])
-            valideMutate = fct.contraintes(mutate)
+            mutate = mutation(solutions[solutionChoisie])
+            valideMutate = contraintes(mutate)
             if valideMutate:
                 # Si la mutation est valide
                 empire = rd.random()
@@ -222,11 +168,13 @@ def genetiqueCascade(solutions, nbGeneration, probaMutation, distances, interven
     """
     Algorithme génétique en cascade
     """
-    sol=cp.deepcopy(solutions)
-    sol1=genetique(sol, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "employe")
-    sol2=genetique(sol1, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "etudiant")
+    sol = cp.deepcopy(solutions)
+    sol1 = genetique(sol, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "employe")
+    print("fin employe")
+    sol2 = genetique(sol1, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "etudiant")
+    print("fin etudiant")
     print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, sol2, MATRICE_DISTANCE)))
-    sol3=genetique(sol2, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "SESSAD")
+    sol3 = genetique(sol2, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "SESSAD")
     return sol3
 
 
@@ -235,7 +183,7 @@ def choixParentsPareto(tableau_fit1, tableau_fit2, tableau_fit3, solutions):
     On execute le font de Pareto et on choisit les parents dans ce front
     """
     x, y, z, sol = pf.pareto_frontier(tableau_fit1, tableau_fit2, tableau_fit3, minX = False, minY = True, minZ = True)
-    if len(sol)==1 or len(sol)==0:
+    if len(sol) == 1 or len(sol) == 0:
         nbSolution = len(solutions)
         indiceParent1 = rd.randint(0, nbSolution//2)
         indiceParent2 = rd.randint(nbSolution//2, nbSolution-1)
@@ -261,12 +209,12 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
         parent1, parent2 = choixParentsPareto(tableau_fit_Em, tableau_fit_Et, tableau_fit_Se, solutions)
         # On crée un enfant
         finCol = rd.randint(1, nbMis - 1)
-        fille1 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
-        fille2 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, finCol, nbMis - 1)
+        fille1 = reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
+        fille2 = reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, finCol, nbMis - 1)
         # On choisie ce que l'on va faire avec les enfants
 
-        valideFille1 = fct.contraintes(fille1)
-        valideFille2 = fct.contraintes(fille2)
+        valideFille1 = contraintes(fille1)
+        valideFille2 = contraintes(fille2)
 
         if valideFille1:
             #fitnessFille1 = fitnessEmInitialisation(mission, intervenants, fille1, distances)
@@ -333,8 +281,8 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
             fitnessChoisiePourMutation_EM = choixFitness_1("employe", mission, intervenants, solutions[solutionChoisie], distances)
             fitnessChoisiePourMutation_Et = choixFitness_1("etudiant", mission, intervenants, solutions[solutionChoisie], distances)
             fitnessChoisiePourMutation_SE = choixFitness_1("SESSAD", mission, intervenants, solutions[solutionChoisie], distances)
-            mutate = tls.mutation(solutions[solutionChoisie])
-            valideMutate = fct.contraintes(mutate)
+            mutate = mutation(solutions[solutionChoisie])
+            valideMutate = contraintes(mutate)
             # Le mutant fonctionne comme dans n'importe quel algo génétique
             if valideMutate:
                 empire = rd.random()
@@ -364,8 +312,6 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
 
 
 def main():
-    charge_fichier_csv("100-10")
-    SOLUTIONS = charger_solution("solutions.txt")
     print("emplo avant")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
     print("SESSAD avant")
@@ -373,7 +319,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS)))
     debut = ti.time()
-    apres = genetiquePareto(SOLUTIONS, 5000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
+    apres = genetiqueCascade(SOLUTIONS, 5000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
     fin=ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
@@ -389,6 +335,8 @@ def main():
     #print(fEm.activites_intervenants(apres[indi]))
 
 
-
 if __name__ == "__main__":
+    # variables globales à CE programme, pas lors de l'import
+    read_sols("TRUE_res.txt")
+    charge_fichier_csv("45-4")
     main()

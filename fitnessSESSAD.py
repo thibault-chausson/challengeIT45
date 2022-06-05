@@ -1,62 +1,7 @@
 import json as js
 import numpy as np
 import fitnessEmployes as fE
-
-MATRICE_DISTANCE = []
-INTERVENANTS = []
-MISSIONS = []
-
-SOLUTIONS = []
-
-
-def charge_fichier_csv(dossier):
-    """
-    Charge le contenue du fichier csv dans les variables globales
-    """
-    with open(f"Instances/{dossier}/Distances.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MATRICE_DISTANCE.append(list(map(float, ligne.split(','))))
-
-    with open(f"Instances/{dossier}/Intervenants.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            INTERVENANTS.append(ligne.split(','))
-
-    with open(f"Instances/{dossier}/Missions.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MISSIONS.append(ligne.split(','))
-
-    # Changements des chiffres de types str en type int
-    for i in range(len(INTERVENANTS)):
-        for j in range(len(INTERVENANTS[i])):
-            try:
-                INTERVENANTS[i][j] = int(INTERVENANTS[i][j])
-            except:
-                pass
-
-    for i in range(len(MISSIONS)):
-        for j in range(len(MISSIONS[i])):
-            try:
-                MISSIONS[i][j] = int(MISSIONS[i][j])
-            except:
-                pass
-
-    return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
-
-
-def charger_solution(dossier):
-    with open(f"./{dossier}", 'r') as f:
-        fich = f.read().split('\n\n')[:-1]
-    SOLUTIONS = [js.loads(i) for i in fich]
-    return SOLUTIONS
+from functions import *
 
 
 def sumWOH_1(mission, inter, solution):
@@ -65,7 +10,7 @@ def sumWOH_1(mission, inter, solution):
     """
     somme = 0
 
-    nbTrav, nbNonTravvvv, nbSup = fE.stats_heures(solution)
+    nbTrav, nbNonTravvvv, nbSup = stats_heures(solution)
     nbHeuresTrav = nbTrav
     nbNonTrav = nbNonTravvvv
     for j in range(len(solution)):
@@ -121,24 +66,7 @@ def fitnessSESSAD(mission, inter, solution, dist_1_Semaine):
     f = (bet * somme + kap * moyDis + kap * maxDis) / 3
     return f
 
-def activites_intervenants(solution):
-    """
-    Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
-    """
-    miss_intervenants = []
-    for i in range(len(solution)):
-        missions = {1: [], 2: [], 3: [], 4: [], 5: []}
-        edt = {1: [], 2: [], 3: [], 4: [], 5: []}
-        for j in range(len(solution[0])):
-            if solution[i][j] == 1:
-                missions[MISSIONS[j][1]].append((j, MISSIONS[j][2]))
-        for jour in missions:
-            temp = sorted(missions[jour], key=lambda x: x[1])
-            edt[jour] = [i[0] for i in temp]
 
-        miss_intervenants.append(edt)
-
-    return miss_intervenants
 
 def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE):
     """
@@ -156,15 +84,10 @@ def fitnessSESSAD_tout(mission, inter, solutions, DISTANCE):
 
 def main():
     charge_fichier_csv("45-4")
-    SOLUTIONS = charger_solution("TRUE_res.txt")
+    SOLUTIONS = read_sols("TRUE_res.txt")
     #print(SOLUTIONS[0])
     #print(activites_intervenants(SOLUTIONS[0]))
     print(fitnessSESSAD_tout(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE))
-
-# sorti du main pour pouvoir charger les variables lors de l'import du fichier et lors de l'execution du fichier
-# J'ai une technique de gitan pour pouvoir remplacer les arguments que j'implementerais plus tard
-charger_solution("TRUE_res.txt")
-charge_fichier_csv("100-10")
 
 if __name__ == "__main__":
     main()

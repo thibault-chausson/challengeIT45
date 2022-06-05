@@ -6,12 +6,12 @@ available to specify minX = False or minY = False or minZ = False to find the ma
 or all parameters.
 '''
 def pareto_frontier(Xs, Ys, Zs, minX = True, minY = True, minZ = True):
-# Sort the list in either ascending or descending order of X
+    # Sort the list in either ascending or descending order of X
     myList1 = [[Xs[i], Ys[i], Zs[i]] for i in range(len(Xs))]
     myList = sorted([[Xs[i], Ys[i], Zs[i]] for i in range(len(Xs))], reverse=minX)
-# Start the Pareto frontier with the first value in the sorted list
+    # Start the Pareto frontier with the first value in the sorted list
     p_front = [myList[0]]
-# Loop through the sorted list
+    # Loop through the sorted list
     for pair in myList[1:]:
         if minY:
             if pair[1] < p_front[-1][1]: # Look for higher values of Y…
@@ -25,7 +25,7 @@ def pareto_frontier(Xs, Ys, Zs, minX = True, minY = True, minZ = True):
         else:
             if pair[2] > p_front[-1][2]: # Look for lower values of Z…
                 p_front.append(pair) # … and add them to the Pareto frontier
-# Turn resulting pairs back into a list of Xs and Ys
+    # Turn resulting pairs back into a list of Xs and Ys
     p_frontX = [pair[0] for pair in p_front]
     p_frontY = [pair[1] for pair in p_front]
     p_frontZ= [pair[2] for pair in p_front]
