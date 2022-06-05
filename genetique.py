@@ -153,6 +153,8 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
         else:
             nbGene = nbGene
             secu += 1
+    if secu > 9998:
+        print("Arret de la recherche")
 
     return solutions
 
@@ -311,6 +313,8 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
         else:
             nbGene = nbGene
             secu += 1
+    if secu > 9998:
+        print("Arret de la recherche")
 
 
     return solutions
