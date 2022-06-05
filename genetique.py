@@ -149,7 +149,8 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
     nbInter = len(intervenants)
     nbMis = len(mission)
     tableau_fit = choixFitness_tableau(type_fit, mission, intervenants, solutions, distances)
-    while nbGene < nbGeneration:
+    secu = 0
+    while nbGene < nbGeneration and secu < 10000:
         # On choisie les deux parents
         parent1, parent2 = tls.choixParents(tableau_fit)
         # On crée un enfant
@@ -202,8 +203,12 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
 
         if valideFille1 or valideFille2:
             nbGene += 1
+            secu = 0
         else:
             nbGene = nbGene
+            secu += 1
+    if secu > 9998:
+        print("Arret de la recherche")
 
     return solutions
 
@@ -256,7 +261,8 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
     tableau_fit_Et = choixFitness_tableau("etudiant", mission, intervenants, solutions, distances)
     tableau_fit_Em = choixFitness_tableau("employe", mission, intervenants, solutions, distances)
     tableau_fit_Se = choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances)
-    while nbGene < nbGeneration:
+    secu = 0
+    while nbGene < nbGeneration and secu < 10000:
         # On choisie les deux parents
         parent1, parent2 = choixParentsPareto(tableau_fit_Em, tableau_fit_Et, tableau_fit_Se, solutions)
         # On crée un enfant
@@ -355,8 +361,12 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
 
         if valideFille1 or valideFille2:
             nbGene += 1
+            secu = 0
         else:
             nbGene = nbGene
+            secu += 1
+    if secu > 9998:
+        print("Arret de la recherche")
 
 
     return solutions
@@ -373,7 +383,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(soll, MISSIONS, INTERVENANTS)))
     debut = ti.time()
-    apres = genetique(soll, 5000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0,"employe")
+    apres = genetiquePareto(soll, 20000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
     fin=ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
