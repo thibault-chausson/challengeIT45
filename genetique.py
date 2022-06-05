@@ -234,7 +234,7 @@ def choixParentsPareto(tableau_fit1, tableau_fit2, tableau_fit3, solutions):
     """
     On execute le font de Pareto et on choisit les parents dans ce front
     """
-    x, y, z, sol = pf.pareto_frontier(tableau_fit1, tableau_fit2, tableau_fit3, minX = False, minY = True, minZ = True)
+    x, y, z, sol = pf.pareto_frontier_multi(tableau_fit1, tableau_fit2, tableau_fit3)
     if len(sol)==1 or len(sol)==0:
         nbSolution = len(solutions)
         indiceParent1 = rd.randint(0, nbSolution//2)
@@ -277,7 +277,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
             indice_Et, max_Et = maxiFit(tableau_fit_Et)
             indice_SE, max_SE = maxiFit(tableau_fit_Se)
             # Si l'enfant est meilleur toutes les fitness on choisit une fitness au hasard et on concerve l'enfant
-            if fitnessFille1_EM < max_Em or fitnessFille1_Et < max_Et or fitnessFille1_SE < max_SE:
+            if fitnessFille1_EM < max_Em and fitnessFille1_Et < max_Et and fitnessFille1_SE < max_SE:
                 ran1=rd.randint(1,3)
                 if ran1==1:
                     solutions[indice_Em] = fille1
