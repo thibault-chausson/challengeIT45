@@ -225,7 +225,7 @@ def main():
 # sorti du main pour pouvoir charger les variables lors de l'import du fichier et lors de l'execution du fichier
 # J'ai une technique de gitan pour pouvoir remplacer les arguments que j'implementerais plus tard
 charger_solution("TRUE_res.txt")
-charge_fichier_csv("45-4")
+charge_fichier_csv("100-10")
 
 if __name__ == "__main__":
     main()

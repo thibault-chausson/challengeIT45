@@ -364,8 +364,8 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
 
 
 def main():
-    charge_fichier_csv("45-4")
-    SOLUTIONS = charger_solution("TRUE_res.txt")
+    charge_fichier_csv("100-10")
+    SOLUTIONS = charger_solution("solutions.txt")
     print("emplo avant")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, SOLUTIONS, MATRICE_DISTANCE)))
     print("SESSAD avant")
@@ -373,7 +373,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS)))
     debut = ti.time()
-    apres = genetiquePareto(SOLUTIONS, 1000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
+    apres = genetiquePareto(SOLUTIONS, 5000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
     fin=ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))

@@ -168,7 +168,7 @@ def gen_n_solutions_uniques(n):
 def main():
 
     start_time = time.time()
-    solutions = gen_n_solutions_uniques(10)
+    solutions = gen_n_solutions_uniques(50)
     print("Temps d'execution: {} secondes pour {} solutions".format(time.time() - start_time, len(solutions)))
 
     with open("solutions.txt", "w") as f:
