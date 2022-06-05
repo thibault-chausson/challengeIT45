@@ -94,7 +94,8 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
     nbInter = len(intervenants)
     nbMis = len(mission)
     tableau_fit = choixFitness_tableau(type_fit, mission, intervenants, solutions, distances)
-    while nbGene < nbGeneration:
+    secu = 0
+    while nbGene < nbGeneration and secu <10000:
         print(f"nbGene: {nbGene}      nbGeneration: {nbGeneration}")
         # On choisie les deux parents
         parent1, parent2 = choixParents(tableau_fit)
@@ -148,8 +149,10 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
 
         if valideFille1 or valideFille2:
             nbGene += 1
+            secu =0
         else:
             nbGene = nbGene
+            secu += 1
 
     return solutions
 
@@ -182,7 +185,7 @@ def choixParentsPareto(tableau_fit1, tableau_fit2, tableau_fit3, solutions):
     """
     On execute le font de Pareto et on choisit les parents dans ce front
     """
-    x, y, z, sol = pf.pareto_frontier(tableau_fit1, tableau_fit2, tableau_fit3, minX = False, minY = True, minZ = True)
+    x, y, z, sol = pf.pareto_frontier_multi(tableau_fit1, tableau_fit2, tableau_fit3)
     if len(sol) == 1 or len(sol) == 0:
         nbSolution = len(solutions)
         indiceParent1 = rd.randint(0, nbSolution//2)
@@ -204,7 +207,8 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
     tableau_fit_Et = choixFitness_tableau("etudiant", mission, intervenants, solutions, distances)
     tableau_fit_Em = choixFitness_tableau("employe", mission, intervenants, solutions, distances)
     tableau_fit_Se = choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances)
-    while nbGene < nbGeneration:
+    secu = 0
+    while nbGene < nbGeneration and secu < 10000:
         # On choisie les deux parents
         parent1, parent2 = choixParentsPareto(tableau_fit_Em, tableau_fit_Et, tableau_fit_Se, solutions)
         # On crée un enfant
@@ -225,7 +229,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
             indice_Et, max_Et = maxiFit(tableau_fit_Et)
             indice_SE, max_SE = maxiFit(tableau_fit_Se)
             # Si l'enfant est meilleur toutes les fitness on choisit une fitness au hasard et on concerve l'enfant
-            if fitnessFille1_EM < max_Em or fitnessFille1_Et < max_Et or fitnessFille1_SE < max_SE:
+            if fitnessFille1_EM < max_Em and fitnessFille1_Et < max_Et and fitnessFille1_SE < max_SE:
                 ran1=rd.randint(1,3)
                 if ran1==1:
                     solutions[indice_Em] = fille1
@@ -303,8 +307,10 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
 
         if valideFille1 or valideFille2:
             nbGene += 1
+            secu = 0
         else:
             nbGene = nbGene
+            secu += 1
 
 
     return solutions
@@ -319,7 +325,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS)))
     debut = ti.time()
-    apres = genetiqueCascade(SOLUTIONS, 5000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
+    apres = genetique(SOLUTIONS, 10000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0, "employe")
     fin=ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))
