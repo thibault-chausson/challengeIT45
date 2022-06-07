@@ -96,7 +96,7 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
     tableau_fit = choixFitness_tableau(type_fit, mission, intervenants, solutions, distances)
     secu = 0
     while nbGene < nbGeneration and secu <10000:
-        print(f"nbGene: {nbGene}      nbGeneration: {nbGeneration}")
+        print(f"Génération:\t{nbGene}/{nbGeneration}", end='\r')
         # On choisie les deux parents
         parent1, parent2 = choixParents(tableau_fit)
         # On crée un enfant
