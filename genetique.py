@@ -151,6 +151,7 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
     tableau_fit = choixFitness_tableau(type_fit, mission, intervenants, solutions, distances)
     secu = 0
     while nbGene < nbGeneration and secu < 10000:
+        print(f"Génération:\t{nbGene}/{nbGeneration}", end='\r')
         # On choisie les deux parents
         parent1, parent2 = tls.choixParents(tableau_fit)
         # On crée un enfant
@@ -230,7 +231,6 @@ def genetiqueCascade(solutions, nbGeneration, probaMutation, distances, interven
     sol=cp.deepcopy(solutions)
     sol1=genetique(sol, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "employe")
     sol2=genetique(sol1, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "etudiant")
-    print(min(fS.fitnessSESSAD_tout(MISSIONS, INTERVENANTS, sol2, MATRICE_DISTANCE)))
     sol3=genetique(sol2, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, "SESSAD")
     return sol3
 
@@ -374,7 +374,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
 
 
 def main():
-    charge_fichier_csv("100-10")
+    charge_fichier_csv("45-4")
     soll = charger_solution("solutions.txt")
     print("emplo avant")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, soll, MATRICE_DISTANCE)))
@@ -383,7 +383,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(soll, MISSIONS, INTERVENANTS)))
     debut = ti.time()
-    apres = genetiquePareto(soll, 20000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
+    apres = genetiqueCascade(soll, 10000, 0.1, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.0)
     fin=ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(MISSIONS, INTERVENANTS, apres, MATRICE_DISTANCE)))

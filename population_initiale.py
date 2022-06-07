@@ -3,7 +3,7 @@ from functions import *
 import time
 import matplotlib.pyplot as plt
 
-MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv("100-10")
+MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv("45-4")
 
 def contrainte2(solution):
     # 2.  Une mission ne peut etre assignee qu’a un intervenant ayant la meme competence (LSF ou LPC)

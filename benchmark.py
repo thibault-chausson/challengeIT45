@@ -161,7 +161,7 @@ def tempsGenePopu (geneMin, geneMax, pas):
 
 
 def main():
-    charge_fichier_csv("96-6")
+    charge_fichier_csv("45-4")
     #tempsGenePopu(5, 150, 10)
     SOLUTIONS = charger_solution("solutions.txt")
     deb, nbPopMax, pas = 10, 230, 2

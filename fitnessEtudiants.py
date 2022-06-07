@@ -113,7 +113,7 @@ def fitnessEtudiants_tout(SOLUTIONS, MISSIONS,INTERVENANTS):
 
 
 def main():
-    charge_fichier_csv("100-10")
+    charge_fichier_csv("45-4")
     SOLUTIONS = charger_solution("TRUE_res.txt")
     #print(SOLUTIONS[0])
     print(fitnessEtudiants_tout(SOLUTIONS, MISSIONS, INTERVENANTS))
