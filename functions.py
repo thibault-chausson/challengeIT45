@@ -2,14 +2,14 @@ import random
 from sol_initiale import *
 import json
 
-MATRICE_DISTANCE = []
-INTERVENANTS = []
-MISSIONS = []
 
 def charge_fichier_csv(dossier):
     """
     Charge le contenue du fichier csv dans les variables globales
     """
+    INTERVENANTS = []
+    MISSIONS = []
+    MATRICE_DISTANCE = []
     with open(f"Instances/{dossier}/Distances.csv", 'r') as fichier:
         lignes = fichier.read().split('\n')
         if lignes[-1] == '':
@@ -23,14 +23,14 @@ def charge_fichier_csv(dossier):
             lignes = lignes[:-1]
         for ligne in lignes:
             INTERVENANTS.append(ligne.split(','))
-    
+
     with open(f"Instances/{dossier}/Missions.csv", 'r') as fichier:
         lignes = fichier.read().split('\n')
         if lignes[-1] == '':
             lignes = lignes[:-1]
         for ligne in lignes:
             MISSIONS.append(ligne.split(','))
-    
+
     # Changements des chiffres de types str en type int
     for i in range(len(INTERVENANTS)):
         for j in range(len(INTERVENANTS[i])):
@@ -48,9 +48,15 @@ def charge_fichier_csv(dossier):
 
     return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
 
-    
 
-def contraintes(solution):
+def charger_solution(dossier):
+    SOLUTIONS = []
+    with open(f"./{dossier}", 'r') as f:
+        fich = f.read().split('\n\n')[:-1]
+    SOLUTIONS = [js.loads(i) for i in fich]
+    return SOLUTIONS
+
+def contraintes(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Vérifie si la solution est valide
     1.  Toutes les missions doivent etre affectees
@@ -138,7 +144,7 @@ def contraintes(solution):
     
     #print("8 passé")
     # 9.  Un intervenant doit avoir assez de temps pour se deplacer d’une mission a une autre.
-    soluce = activites_intervenants(solution)
+    soluce = activites_intervenants(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
     vitesse_deplacement = 833 # exprimée en m/minutes
 
     for edt in soluce:
@@ -172,7 +178,7 @@ def read_sols(fichier):
     return solutions
 
 
-def activites_intervenants(solution):
+def activites_intervenants(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
     """

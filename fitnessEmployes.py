@@ -2,65 +2,12 @@ import json as js
 import statistics as st
 import numpy as np
 
-MATRICE_DISTANCE = []
-INTERVENANTS = []
-MISSIONS = []
-SOLUTIONS = []  # Les lignes representent les formateurs (interfaces) et les colones les missions
+import functions as fn
 
 
 
-def charge_fichier_csv(dossier):
-    """
-    Charge le contenue du fichier csv dans les variables globales
-    """
-    with open(f"Instances/{dossier}/Distances.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MATRICE_DISTANCE.append(list(map(float, ligne.split(','))))
 
-    with open(f"Instances/{dossier}/Intervenants.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            INTERVENANTS.append(ligne.split(','))
-
-    with open(f"Instances/{dossier}/Missions.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MISSIONS.append(ligne.split(','))
-
-    # Changements des chiffres de types str en type int
-    for i in range(len(INTERVENANTS)):
-        for j in range(len(INTERVENANTS[i])):
-            try:
-                INTERVENANTS[i][j] = int(INTERVENANTS[i][j])
-            except:
-                pass
-
-    for i in range(len(MISSIONS)):
-        for j in range(len(MISSIONS[i])):
-            try:
-                MISSIONS[i][j] = int(MISSIONS[i][j])
-            except:
-                pass
-
-    return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
-
-
-def charger_solution(dossier):
-    with open(f"./{dossier}", 'r') as f:
-        fich = f.read().split('\n\n')[:-1]
-    for i in fich:
-        SOLUTIONS.append(js.loads(i))
-    return SOLUTIONS
-
-
-def stats_heures(solution):
+def stats_heures(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoies des informations sur le nombre d'heures travaillées par les intervenants
     """
@@ -126,7 +73,7 @@ def distance_employs_toutes_missions (solutions, DISTANCES,inter,mis):
 """
 
 
-def activites_intervenants(solution):
+def activites_intervenants(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
     """
@@ -148,7 +95,7 @@ def activites_intervenants(solution):
 
 
 
-def distance_employe(planning_1_mission):
+def distance_employe(planning_1_mission, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoie la distance effectuée par les employés
     Prend en argument un planning (tableau de tableaux de missions classé par jour et par intervenant)
@@ -179,7 +126,7 @@ def distance_employe(planning_1_mission):
     return distance
 
 
-def moyenne_toutes_distances(): #DISTANCES est une matrice carrée
+def moyenne_toutes_distances(MATRICE_DISTANCE, INTERVENANTS, MISSIONS): #DISTANCES est une matrice carrée
     """
     Renvoie la moyenne de toutes les distances entre le centre et les étudiants, et entre les étudiants et le centre
     """
@@ -189,13 +136,13 @@ def moyenne_toutes_distances(): #DISTANCES est une matrice carrée
     return somme / len(INTERVENANTS)
 
 
-def kapa():
+def kapa(MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoie la valeur de kapa
     """
-    return 100 / moyenne_toutes_distances()
+    return 100 / moyenne_toutes_distances(MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
 
-def zeta():
+def zeta(MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoie la valeur de zeta
     """
@@ -207,25 +154,21 @@ def gamma():
     """
     return 10
 
-def fitnessEm(ecart_WH, ecart_OH, ecart_D):
+def fitnessEm(ecart_WH, ecart_OH, ecart_D, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoie la valeur de la fonction de fitness pour les employés
     """
-    return (zeta() * ecart_WH + gamma() * ecart_OH + kapa() * ecart_D) / 3
+    return (zeta(MATRICE_DISTANCE, INTERVENANTS, MISSIONS) * ecart_WH + gamma() * ecart_OH + kapa(MATRICE_DISTANCE, INTERVENANTS, MISSIONS) * ecart_D) / 3
 
 
 def main():
-    print(SOLUTIONS[0])
-    nb_tra, nb_non_tra, nb_sup = stats_heures(SOLUTIONS[0])
+    SOLUTIONS = fn.charger_solutions("45-4")
+    MATRICE_DISTANCE, INTERVENANTS, MISSIONS = fn.charger_fichier_csv("45-4")
+    nb_tra, nb_non_tra, nb_sup = stats_heures(SOLUTIONS)
     ecart_dis = st.pstdev(distance_employe(activites_intervenants(SOLUTIONS[0])))
     ecart_WH = st.pstdev(nb_non_tra)
     ecart_OH = st.pstdev(nb_sup)
     print(fitnessEm(ecart_WH, ecart_OH, ecart_dis))
-
-# sorti du main pour pouvoir charger les variables lors de l'import du fichier et lors de l'execution du fichier
-# J'ai une technique de gitan pour pouvoir remplacer les arguments que j'implementerais plus tard
-charger_solution("TRUE_res.txt")
-charge_fichier_csv("45-4")
 
 if __name__ == "__main__":
     main()

@@ -1,11 +1,10 @@
 import random
-from functions import *
+import functions as fn
 import time
 import matplotlib.pyplot as plt
 
-MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv("45-4")
 
-def contrainte2(solution):
+def contrainte2(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     # 2.  Une mission ne peut etre assignee qu’a un intervenant ayant la meme competence (LSF ou LPC)
     for i in range(len(INTERVENANTS)):
         for j in range(len(MISSIONS)):
@@ -14,7 +13,7 @@ def contrainte2(solution):
                     return False
     return True
 
-def contrainte3(solution):
+def contrainte3(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     # 3.  Chaque Intervenant ne peut realiser qu’une mission a la fois
     for i in range(len(INTERVENANTS)):
         missions = [y for y in range(len(MISSIONS)) if solution[i][y] == 1]
@@ -26,7 +25,7 @@ def contrainte3(solution):
     return True
 
 
-def contrainte7(solution):    
+def contrainte7(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):    
     # 7.  Respecter la limite des heures supplementaires autorisees a travailler par les intervenants sur le plan de planification (heures supplementaires = 10h/semaine, 2h/jour)
     # a modifier si on integre le délire de travail a mis temps / plein temps
     for i in range(len(INTERVENANTS)):
@@ -40,7 +39,7 @@ def contrainte7(solution):
     return True
 
 
-def contrainte8(solution):
+def contrainte8(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     # 8.  Respecter l’amplitude de la journee de travail de chaque intervenant (amplitude = 12h)
     for i in range(len(INTERVENANTS)):
         temps_travaille = {1:[2000, 0], 2:[2000, 0], 3:[2000, 0], 4:[2000, 0], 5:[2000, 0]}
@@ -56,9 +55,9 @@ def contrainte8(solution):
     return True
 
 
-def contrainte9(solution):
+def contrainte9(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     # 9.  Un intervenant doit avoir assez de temps pour se deplacer d’une mission a une autre.
-    soluce = activites_intervenants(solution)
+    soluce = fn.activites_intervenants(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
     vitesse_deplacement = 833 # exprimée en m/minutes
     for edt in soluce:
         for jour in edt:
@@ -79,25 +78,25 @@ def contrainte9(solution):
                         return False
     return True
 
-def verif_contraintes(solution):
+def verif_contraintes(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Ne vérifie pas toutes les contraintes car certaines contraintes ont besoin d'une solution finalisée pour etre validé.
     """
-    if not contrainte2(solution):
+    if not contrainte2(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
         return False
-    if not contrainte3(solution):
+    if not contrainte3(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
         return False
-    if not contrainte7(solution):
+    if not contrainte7(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
         return False
-    if not contrainte8(solution):
+    if not contrainte8(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
         return False
-    if not contrainte9(solution):
+    if not contrainte9(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
         return False
     return True
     
 
 
-def individu(i, j):
+def individu(i, j, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Renvoie une solution aléatoire.
     """
@@ -113,14 +112,14 @@ def individu(i, j):
     solution[i][j] = 1
     missions_assignees.append(j)
 
-    if not contrainte2(solution):
+    if not contrainte2(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
         return False
 
     for i in range(len(INTERVENANTS)):
         for j in range(len(MISSIONS)):
             if (i, j) not in immuable and j not in missions_assignees:
                 solution[i][j] = 1
-                if not verif_contraintes(solution):
+                if not verif_contraintes(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
                     solution[i][j] = 0
                 else:
                     missions_assignees.append(j)
@@ -129,13 +128,13 @@ def individu(i, j):
         if i not in missions_assignees:
             for j in range(len(INTERVENANTS)):
                 solution[j][i] = 1
-                if not verif_contraintes(solution):
+                if not verif_contraintes(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
                     solution[j][i] = 0
                 else:
                     missions_assignees.append(i)
                     break
 
-    if not contraintes(solution):
+    if not fn.contraintes(solution, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
         return False
 
     # print("solution trouvée")
@@ -144,7 +143,7 @@ def individu(i, j):
 
 
 
-def gen_n_solutions_uniques(n):
+def gen_n_solutions_uniques(n, MATRICE_DISTANCE, INTERVENANTS, MISSIONS):
     """
     Génère n solutions aléatoires.
     Retourne une liste des n solutions.
@@ -154,7 +153,7 @@ def gen_n_solutions_uniques(n):
         solutions = []
         for i in range(len(INTERVENANTS)):
             for j in range(len(MISSIONS)):
-                res = individu(i, j)
+                res = individu(i, j, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
                 if res != False and res not in solutions:
                     solutions.append(res)
         for i in solutions:
