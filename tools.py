@@ -3,63 +3,7 @@ import statistics as st
 import numpy as np
 import random as rd
 import copy as cop
-
-MATRICE_DISTANCE = []
-INTERVENANTS = []
-MISSIONS = []
-
-SOLUTIONS = []  # Les lignes representent les formateurs (interfaces) et les colones les missions
-
-
-def charge_fichier_csv(dossier):
-    """
-    Charge le contenue du fichier csv dans les variables globales
-    """
-    with open(f"Instances/{dossier}/Distances.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MATRICE_DISTANCE.append(list(map(float, ligne.split(','))))
-
-    with open(f"Instances/{dossier}/Intervenants.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            INTERVENANTS.append(ligne.split(','))
-
-    with open(f"Instances/{dossier}/Missions.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MISSIONS.append(ligne.split(','))
-
-    # Changements des chiffres de types str en type int
-    for i in range(len(INTERVENANTS)):
-        for j in range(len(INTERVENANTS[i])):
-            try:
-                INTERVENANTS[i][j] = int(INTERVENANTS[i][j])
-            except:
-                pass
-
-    for i in range(len(MISSIONS)):
-        for j in range(len(MISSIONS[i])):
-            try:
-                MISSIONS[i][j] = int(MISSIONS[i][j])
-            except:
-                pass
-
-    return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
-
-
-
-def charger_solution(dossier):
-    with open(f"./{dossier}", 'r') as f:
-        fich = f.read().split('\n\n')[:-1]
-    SOLUTIONS = [js.loads(i) for i in fich]
-    return SOLUTIONS
+import functions as fc
 
 
 
@@ -146,8 +90,8 @@ def mutation(solution):
 
 
 def main():
-    charge_fichier_csv("45-4")
-    SOLUTIONS = charger_solution("TRUE_res.txt")
+    matrice_distance, intervenants, missions = fc.charge_fichier_csv("45-4")
+    SOLUTIONS = fc.charger_solution("solutions.txt")
     print(SOLUTIONS)
 
 

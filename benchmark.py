@@ -10,77 +10,25 @@ import matplotlib.pyplot as plt
 
 import population_initiale as pI
 
-MATRICE_DISTANCE = []
-INTERVENANTS = []
-MISSIONS = []
-
-SOLUTIONS = []
+import functions as f
 
 
-def charge_fichier_csv(dossier):
-    """
-    Charge le contenue du fichier csv dans les variables globales
-    """
-    with open(f"Instances/{dossier}/Distances.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MATRICE_DISTANCE.append(list(map(float, ligne.split(','))))
-
-    with open(f"Instances/{dossier}/Intervenants.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            INTERVENANTS.append(ligne.split(','))
-
-    with open(f"Instances/{dossier}/Missions.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MISSIONS.append(ligne.split(','))
-
-    # Changements des chiffres de types str en type int
-    for i in range(len(INTERVENANTS)):
-        for j in range(len(INTERVENANTS[i])):
-            try:
-                INTERVENANTS[i][j] = int(INTERVENANTS[i][j])
-            except:
-                pass
-
-    for i in range(len(MISSIONS)):
-        for j in range(len(MISSIONS[i])):
-            try:
-                MISSIONS[i][j] = int(MISSIONS[i][j])
-            except:
-                pass
-
-    return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
 
 
-def charger_solution(dossier):
-    with open(f"./{dossier}", 'r') as f:
-        fich = f.read().split('\n\n')[:-1]
-    SOLUTIONS = [js.loads(i) for i in fich]
-    return SOLUTIONS
 
-
-def duree(deb, nbPopMax, pas):
+def duree(deb, nbPopMax, pas, matrice_distance, intervenants, missions, type, sol):
     """
     Fonction qui permet de calculer le temps d'exécution de X générations
     A chaque tour dans la boucle for on reprend la solution précédente et ainsi on évite de repartir du début
     On renvoit le temps d'exécution de la génération de X générations en secondes dans un tableau
     """
-    sol = charger_solution("solutions.txt")
     print(len(sol[0]))
     temps = [0]
     x = [0]
     indice = 0
     debut = ti.time()
     for i in range(deb, nbPopMax + pas, pas):
-        sol = gene.genetique(sol, i, 0.07, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.00, "employe")
+        sol = gene.genetique(sol, i, 0.07, matrice_distance, intervenants, missions, 0.00, type)
         fin = ti.time()
         x.append(x[indice] + i)
         indice += 1
@@ -96,20 +44,20 @@ def duree(deb, nbPopMax, pas):
     return x, temps
 
 
-def evolutionFit(deb, nbPopMax, pas, type):
+def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missions):
     """
     Fonction qui permet de calculer l'évolution de la fitness des générations
     A chaque tour dans la boucle for on reprend la solution précédente et ainsi on évite de repartir du début
     On renvoit la fitness de la génération de X générations dans un tableau
     """
-    sol = charger_solution("solutions.txt")
+    sol = f.charger_solution("solutions.txt")
     print(len(sol[0]))
-    fit = [min(gene.choixFitness_tableau(type, MISSIONS, INTERVENANTS, sol, MATRICE_DISTANCE))]
+    fit = [min(gene.choixFitness_tableau(type, missions, intervenants, sol, matrice_distance))]
     x = [0]
     indice = 0
     for i in range(deb, nbPopMax + pas, pas):
-        sol = gene.genetique(sol, i, 0.07, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, 0.00, type)
-        finFit = min(gene.choixFitness_tableau(type, MISSIONS, INTERVENANTS, sol, MATRICE_DISTANCE))
+        sol = gene.genetique(sol, i, 0.07, matrice_distance, intervenants, missions, 0.00, type)
+        finFit = min(gene.choixFitness_tableau(type, missions, intervenants, sol, matrice_distance))
         fit.append(finFit)
         x.append(x[indice] + i)
         indice += 1
@@ -161,12 +109,12 @@ def tempsGenePopu (geneMin, geneMax, pas):
 
 
 def main():
-    charge_fichier_csv("45-4")
+    distance, intervenants, missions = f.charge_fichier_csv("45-4")
     #tempsGenePopu(5, 150, 10)
-    SOLUTIONS = charger_solution("solutions.txt")
-    deb, nbPopMax, pas = 10, 230, 2
+    solutions = f.charger_solution("solutions.txt")
+    deb, nbPopMax, pas = 10, 90, 2
     print(nbSolutionnn(deb, nbPopMax, pas))
-    x, y = duree(deb, nbPopMax, pas)
+    x, y = duree(deb, nbPopMax, pas, distance, intervenants, missions, "employe", solutions)
 
 
 if __name__ == "__main__":

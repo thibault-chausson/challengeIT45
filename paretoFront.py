@@ -44,27 +44,7 @@ def pareto_frontier_multi(X,Y,Z):
 
 
 
-#import matplotlib.pyplot as plt
-#Xs, Ys = # get your data from somewhere to go here
 
-#Ys =[132.94335445, 137.72940963, 137.01104522, 133.5484552,  135.61765744, 133.26613336, 134.46457897, 133.3384147,  140.35968568, 136.06612801]
-
-#Xs = [ 5.16478757,  6.17605695,  5.98117115,  4.34084136,  6.26172972 , 5.69453693, 5.96983248,  3.88568802, 10.48808275,  6.53983584 ]
-
-#Zs = [77.77777778, 73.33333333, 84.44444444, 71.11111111, 73.33333333, 64.44444444, 68.88888889, 84.44444444, 75.55555556, 80.    ]
-
-
-# Find lowest values for cost and highest for savings
-#p_front = pareto_frontier(Xs, Ys, Zs, minX= False, minY= True, minZ= True)
-# Plot a scatter graph of all results
-#fig = plt.figure()
-#ax = fig.gca(projection='3d')  # Affichage en 3D
-#ax.scatter(Xs, Ys, Zs, label='Courbe', marker='d')  # Tracé des points 3D
-# Then plot the Pareto frontier on top
-#plt.plot(p_front[0], p_front[1],p_front[2], color='red')
-#plt.show()
-
-#print(p_front)
 
 
 

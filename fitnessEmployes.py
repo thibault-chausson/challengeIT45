@@ -1,89 +1,30 @@
-import json as js
-import statistics as st
 import numpy as np
 
-MATRICE_DISTANCE = []
-INTERVENANTS = []
-MISSIONS = []
-SOLUTIONS = []  # Les lignes representent les formateurs (interfaces) et les colones les missions
 
 
 
-def charge_fichier_csv(dossier):
-    """
-    Charge le contenue du fichier csv dans les variables globales
-    """
-    with open(f"Instances/{dossier}/Distances.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MATRICE_DISTANCE.append(list(map(float, ligne.split(','))))
 
-    with open(f"Instances/{dossier}/Intervenants.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            INTERVENANTS.append(ligne.split(','))
-
-    with open(f"Instances/{dossier}/Missions.csv", 'r') as fichier:
-        lignes = fichier.read().split('\n')
-        if lignes[-1] == '':
-            lignes = lignes[:-1]
-        for ligne in lignes:
-            MISSIONS.append(ligne.split(','))
-
-    # Changements des chiffres de types str en type int
-    for i in range(len(INTERVENANTS)):
-        for j in range(len(INTERVENANTS[i])):
-            try:
-                INTERVENANTS[i][j] = int(INTERVENANTS[i][j])
-            except:
-                pass
-
-    for i in range(len(MISSIONS)):
-        for j in range(len(MISSIONS[i])):
-            try:
-                MISSIONS[i][j] = int(MISSIONS[i][j])
-            except:
-                pass
-
-    return (MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
-
-
-def charger_solution(dossier):
-    with open(f"./{dossier}", 'r') as f:
-        fich = f.read().split('\n\n')[:-1]
-    for i in fich:
-        SOLUTIONS.append(js.loads(i))
-    return SOLUTIONS
-
-
-def stats_heures(solution):
+def stats_heures(solution, intervenant, mission):
     """
     Renvoies des informations sur le nombre d'heures travaillées par les intervenants
     """
-    inters = len(INTERVENANTS)
+    inters = len(intervenant)
     nb_heuresTravaille = np.zeros(inters)
     nb_heuresNonTravaille = np.zeros(inters)
     nb_heureSup = np.zeros(inters)
 
-
     for i in range(inters):
-        for j in range(len(MISSIONS)):
+        for j in range(len(mission)):
             if solution[i][j] == 1:
-                nb_heuresTravaille[i] += (MISSIONS[j][3] - MISSIONS[j][2]) / 60
+                nb_heuresTravaille[i] += (mission[j][3] - mission[j][2]) / 60
 
-        tps = nb_heuresTravaille[i] - INTERVENANTS[i][3]
+        tps = nb_heuresTravaille[i] - intervenant[i][3]
         if tps < 0:
             nb_heuresNonTravaille[i] += abs(tps)
         else:
             nb_heureSup[i] = abs(tps)
-    
+
     return nb_heuresTravaille, nb_heuresNonTravaille, nb_heureSup
-
-
 
 
 """
@@ -126,29 +67,9 @@ def distance_employs_toutes_missions (solutions, DISTANCES,inter,mis):
 """
 
 
-def activites_intervenants(solution):
-    """
-    Renvoie les id des missions effectues par chaque intervenant, rangés dans l'ordre horaire
-    """
-    miss_intervenants = []
-    for i in range(len(INTERVENANTS)):
-        missions = {1:[], 2:[], 3:[], 4:[], 5:[]}
-        edt = {1:[], 2:[], 3:[], 4:[], 5:[]}
-        for j in range(len(MISSIONS)):
-            if solution[i][j] == 1:
-                missions[MISSIONS[j][1]].append((j, MISSIONS[j][2]))
-
-        for jour in missions:
-            temp = sorted(missions[jour], key=lambda x: x[1])
-            edt[jour] = [i[0] for i in temp]
-
-        miss_intervenants.append(edt)
-    
-    return miss_intervenants
 
 
-
-def distance_employe(planning_1_mission):
+def distance_employe(planning_1_mission, distance_matrice):
     """
     Renvoie la distance effectuée par les employés
     Prend en argument un planning (tableau de tableaux de missions classé par jour et par intervenant)
@@ -156,50 +77,52 @@ def distance_employe(planning_1_mission):
     """
     nbInter = len(planning_1_mission)
     nbJour = len(planning_1_mission[0])
-    distance = np.zeros(nbInter) #distance par semaine pour un intervenant
+    distance = np.zeros(nbInter)  # distance par semaine pour un intervenant
     for i in range(nbInter):
-        for j in range(1,nbJour+1):
+        for j in range(1, nbJour + 1):
             nbMissionsJournal = len(planning_1_mission[i][j])
-            for k in range(nbMissionsJournal+1):
-                if k ==0 :
-                    if len(planning_1_mission[i][j])==0:
-                        distance[i]+=0
+            for k in range(nbMissionsJournal + 1):
+                if k == 0:
+                    if len(planning_1_mission[i][j]) == 0:
+                        distance[i] += 0
                     else:
-                        distance[i] += MATRICE_DISTANCE[0][planning_1_mission[i][j][k]]
-                elif k==nbMissionsJournal:
-                    if len(planning_1_mission[i][j])==0:
-                        distance[i]+=0
+                        distance[i] += distance_matrice[0][planning_1_mission[i][j][k]]
+                elif k == nbMissionsJournal:
+                    if len(planning_1_mission[i][j]) == 0:
+                        distance[i] += 0
                     else:
-                        distance[i] += MATRICE_DISTANCE[planning_1_mission[i][j][k-1]][0]
+                        distance[i] += distance_matrice[planning_1_mission[i][j][k - 1]][0]
                 else:
-                    if len(planning_1_mission[i][j])==0:
-                        distance[i]+=0
+                    if len(planning_1_mission[i][j]) == 0:
+                        distance[i] += 0
                     else:
-                        distance[i] += MATRICE_DISTANCE[planning_1_mission[i][j][k-1]][planning_1_mission[i][j][k]]
+                        distance[i] += distance_matrice[planning_1_mission[i][j][k - 1]][planning_1_mission[i][j][k]]
     return distance
 
 
-def moyenne_toutes_distances(): #DISTANCES est une matrice carrée
+def moyenne_toutes_distances(distance_mat, interve):  # DISTANCES est une matrice carrée
     """
     Renvoie la moyenne de toutes les distances entre le centre et les étudiants, et entre les étudiants et le centre
     """
     somme = 0
-    for i in range(len(MATRICE_DISTANCE)):
-        somme += MATRICE_DISTANCE[i][0] + MATRICE_DISTANCE[0][i]
-    return somme / len(INTERVENANTS)
+    for i in range(len(distance_mat)):
+        somme += distance_mat[i][0] + distance_mat[0][i]
+    return somme / len(interve)
 
 
-def kapa():
+def kapa(matrice_distance, interve):
     """
     Renvoie la valeur de kapa
     """
-    return 100 / moyenne_toutes_distances()
+    return 100 / moyenne_toutes_distances(matrice_distance, interve)
 
-def zeta():
+
+def zeta(interve):
     """
     Renvoie la valeur de zeta
     """
-    return 100 / sum([INTERVENANTS[i][3] for i in range(len(INTERVENANTS))])
+    return 100 / sum([interve[i][3] for i in range(len(interve))])
+
 
 def gamma():
     """
@@ -207,25 +130,12 @@ def gamma():
     """
     return 10
 
-def fitnessEm(ecart_WH, ecart_OH, ecart_D):
+
+def fitnessEm(ecart_WH, ecart_OH, ecart_D, intervenants, distance):
     """
     Renvoie la valeur de la fonction de fitness pour les employés
     """
-    return (zeta() * ecart_WH + gamma() * ecart_OH + kapa() * ecart_D) / 3
+    return (zeta(intervenants) * ecart_WH + gamma() * ecart_OH + kapa(distance, intervenants) * ecart_D) / 3
 
 
-def main():
-    print(SOLUTIONS[0])
-    nb_tra, nb_non_tra, nb_sup = stats_heures(SOLUTIONS[0])
-    ecart_dis = st.pstdev(distance_employe(activites_intervenants(SOLUTIONS[0])))
-    ecart_WH = st.pstdev(nb_non_tra)
-    ecart_OH = st.pstdev(nb_sup)
-    print(fitnessEm(ecart_WH, ecart_OH, ecart_dis))
 
-# sorti du main pour pouvoir charger les variables lors de l'import du fichier et lors de l'execution du fichier
-# J'ai une technique de gitan pour pouvoir remplacer les arguments que j'implementerais plus tard
-charger_solution("TRUE_res.txt")
-charge_fichier_csv("45-4")
-
-if __name__ == "__main__":
-    main()
