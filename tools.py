@@ -1,10 +1,9 @@
-import json as js
-import statistics as st
 import numpy as np
 import random as rd
 import copy as cop
 import functions as fc
 import genetique as g
+import population_initiale as pop
 
 
 
@@ -135,6 +134,21 @@ def normalisationTableaux(fitness):
     for i in range(nbSol):
         normalise[i] = (fitness[i] - minimum) / (maximum - minimum) +1
     return normalise
+
+
+def remplacement(fitness_tab, sol, intervenants, missions, matrice_distance):
+    solution = cop.deepcopy(sol)
+    mediane = np.median(fitness_tab)
+    nbSol = len(fitness_tab)
+    nbIndividu = nbSol // 2 +1
+    j = 0
+    population_remplacement = pop.gen_n_solutions_uniques(nbIndividu, intervenants, missions, matrice_distance)
+    for i in range(nbSol):
+        if fitness_tab[i] > mediane:
+            solution[i] = population_remplacement[j]
+            j += 1
+    return solution
+
 
 def main():
     matrice_distance, intervenants, missions = fc.charge_fichier_csv("45-4")

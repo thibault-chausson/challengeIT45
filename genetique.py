@@ -81,9 +81,10 @@ def choixFitness_tableau(fit, mission, intervenants, solutions, distances):
         return "erreur"
 
 
-def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, type_fit):
+def genetique(solution, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, type_fit, colon):
     # Initialisation de la population
 
+    solutions = cp.deepcopy(solution)
     nbGene = 0
     nbPlanning = len(solutions)
     nbInter = len(intervenants)
@@ -157,6 +158,14 @@ def genetique(solutions, nbGeneration, probaMutation, distances, intervenants, m
             nbGene = nbGene
             secu += 1
 
+
+        if secu > 5000 and colon:
+            solutions = cp.deepcopy(tls.remplacement(tableau_fit, solutions, intervenants, mission, distances))
+            tableau_fit = cp.deepcopy(choixFitness_tableau(type_fit, mission, intervenants, solutions, distances))
+            print("Nouvelle population, des colons arrivent")
+            secu = 0
+
+
     if secu > 9998:
         print("Nombre de générations faites :", nbGene)
         print("Arret de la recherche")
@@ -177,19 +186,19 @@ def mini(tab):
 
 
 def genetiqueCascade(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire,
-                     nbTour):
+                     nbTour , colon):
     """
     Algorithme génétique en cascade
     """
     sol = cp.deepcopy(solutions)
     for i in range(1, nbTour + 1):
         sol1 = genetique(sol, nbGeneration * (1 / (i + 1)), probaMutation, distances, intervenants, mission,
-                         probaMissionEmpire, "employe")
+                         probaMissionEmpire, "employe", colon)
         sol2 = genetique(sol1, nbGeneration * (1 + i / (nbTour)) * 1.1 * (1 / i), probaMutation, distances,
                          intervenants, mission, probaMissionEmpire,
-                         "etudiant")
+                         "etudiant", colon)
         sol = genetique(sol2, nbGeneration * (1 + i / (nbTour)) * 0.9 * (1 / i), probaMutation, distances, intervenants,
-                        mission, probaMissionEmpire, "SESSAD")
+                        mission, probaMissionEmpire, "SESSAD", colon)
 
     return sol
 
@@ -623,8 +632,8 @@ def genetiqueMoyenne(solutions, nbGeneration, probaMutation, distances, interven
 
 
 def main():
-    matrice_distance, intervenants, missions = fct.charge_fichier_csv("100-10")
-    #pop.fichier_sol(400, matrice_distance, intervenants, missions)
+    matrice_distance, intervenants, missions = fct.charge_fichier_csv("45-4")
+    #pop.fichier_sol(50, matrice_distance, intervenants, missions)
     soll = fct.charger_solution("solutions.txt")
     print("emplo avant")
     print(min(tableau_fitnessEM(missions, intervenants, soll, matrice_distance)))
@@ -633,7 +642,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(soll, missions, intervenants)))
     debut = ti.time()
-    apres = genetiqueMoyenne(soll, 70000, 0.2, matrice_distance, intervenants, missions, 0.01)
+    apres = genetique(soll, 7000, 0.2, matrice_distance, intervenants, missions, 0.01, "employe", True)
     fin = ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(missions, intervenants, apres, matrice_distance)))
