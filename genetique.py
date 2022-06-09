@@ -633,7 +633,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(soll, missions, intervenants)))
     debut = ti.time()
-    apres = genetiqueMoyenneNorma(soll, 70000, 0.2, matrice_distance, intervenants, missions, 0.01)
+    apres = genetiqueMoyenne(soll, 70000, 0.2, matrice_distance, intervenants, missions, 0.01)
     fin = ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(missions, intervenants, apres, matrice_distance)))
