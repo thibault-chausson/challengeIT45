@@ -4,6 +4,7 @@ import numpy as np
 import random as rd
 import copy as cop
 import functions as fc
+import genetique as g
 
 
 
@@ -99,6 +100,18 @@ def mutation(solution):
     (solution[rdLine1][rdCol], solution[rdLine2][rdCol]) = (solution[rdLine2][rdCol], solution[rdLine1][rdCol])
     return solution
 
+def moyenneFitness(fitness1, fitness2, fitness3):
+    """
+    Retourne la moyenne des tableaux des Fitness
+    """
+    nbSol = len(fitness1)
+    moyenne = np.zeros(nbSol)
+    for i in range(nbSol):
+        moyenne[i] = (fitness1[i] + fitness2[i] + fitness3[i]) / 3
+    return moyenne
+
+def moyenneFit_1(mission, intervenants, solution_1,distances):
+    return (g.choixFitness_1("employe", mission, intervenants, solution_1,distances) + g.choixFitness_1("etudiant", mission, intervenants, solution_1,distances) + g.choixFitness_1("SESSAD", mission, intervenants, solution_1,distances))/3
 
 
 
