@@ -445,7 +445,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
     return solutions
 
 
-def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
+def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, colon):
     # Initialisation de la population
 
     nbGene = 0
@@ -458,7 +458,7 @@ def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, int
     while nbGene < nbGeneration and secu < 10000:
         print(f"Génération:\t{nbGene}/{nbGeneration}", end='\r')
         # On choisie les deux parents
-        normalise = tls.normalisationTableaux(tableau_fit_moy)
+        normalise = cp.deepcopy(tls.normalisationTableaux(tableau_fit_moy))
         parent1, parent2 = tls.choixParents(normalise)
         # On crée un enfant
         finCol = rd.randint(1, nbMis - 1)
@@ -531,6 +531,12 @@ def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, int
                     solutions[solutionChoisie] = mutate
                     tableau_fit_moy[solutionChoisie] = fitnessMutate
 
+        if secu > 5000 and colon:
+            solutions = cp.deepcopy(tls.remplacement(tableau_fit_moy, solutions, intervenants, mission, distances))
+            tableau_fit_moy = cp.deepcopy(tls.moyenneFitness(choixFitness_tableau("employe", mission, intervenants, solutions, distances), choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances), choixFitness_tableau("etudiant", mission, intervenants, solutions, distances)))
+            print("Nouvelle population, des colons arrivent")
+            secu = 0
+
         if valideFille1 or valideFille2:
             nbGene += 1
             secu = 0
@@ -547,7 +553,7 @@ def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, int
     return solutions
 
 
-def genetiqueMoyenne(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
+def genetiqueMoyenne(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, colon):
     # Initialisation de la population
 
     nbGene = 0
@@ -615,6 +621,12 @@ def genetiqueMoyenne(solutions, nbGeneration, probaMutation, distances, interven
                     solutions[solutionChoisie] = mutate
                     tableau_fit_moy[solutionChoisie] = fitnessMutate
 
+        if secu > 5000 and colon:
+            solutions = cp.deepcopy(tls.remplacement(tableau_fit_moy, solutions, intervenants, mission, distances))
+            tableau_fit_moy = cp.deepcopy(tls.moyenneFitness(choixFitness_tableau("employe", mission, intervenants, solutions, distances), choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances), choixFitness_tableau("etudiant", mission, intervenants, solutions, distances)))
+            print("Nouvelle population, des colons arrivent")
+            secu = 0
+
         if valideFille1 or valideFille2:
             nbGene += 1
             secu = 0
@@ -642,7 +654,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(soll, missions, intervenants)))
     debut = ti.time()
-    apres = genetique(soll, 7000, 0.2, matrice_distance, intervenants, missions, 0.01, "employe", True)
+    apres = genetiqueMoyenneNorma(soll, 3000, 0.2, matrice_distance, intervenants, missions, 0.0, True)
     fin = ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(missions, intervenants, apres, matrice_distance)))
