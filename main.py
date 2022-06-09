@@ -8,3 +8,7 @@ genetique pareto, variable :  nbGeneration, probaMutation,  probaMissionEmpire
 genetique moyenne, variable :  nbGeneration, probaMutation,  probaMissionEmpire
 genetique moyenne normalisée :  nbGeneration, probaMutation, probaMissionEmpire
 """
+
+
+#TODO: faire un menu pour choisir l'algorithme
+#TODO: faire une fonction pour enrgistrer le meilleur résultat et le planing dans un fichier
