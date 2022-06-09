@@ -46,12 +46,13 @@ def main():
     dossier = args.dossier
     remplace = args.remplace
     type_algo = args.type
+    type_fit = args.fitness
     nbTour = 0 if args.nbTour is None else args.nbTour
 
     MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv(dossier)
 
     print("Génération de la population initiale...")
-    pop_initiale = population_initiale.gen_n_solutions_uniques(nbPopInitiale, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
+    pop_initiale = population_initiale.gen_n_solutions_uniques(nbPopInitiale, INTERVENANTS, MISSIONS, MATRICE_DISTANCE)
     
     
     if type_algo == "classique":
