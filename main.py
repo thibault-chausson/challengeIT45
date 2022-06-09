@@ -31,7 +31,7 @@ def main():
     parser.add_argument('-g', '--generations', type=int, help='Nombre de générations')
     parser.add_argument('-p', '--population', type=int, help='Nombre d\'individus dans la population')
     parser.add_argument('-m', '--mutation', type=float, help='Probabilité de mutation')
-    parser.add_argument('-n', '--nbTour', type=int, help='Nombre d\'éxecutions de l\'algorithme génétique en cascade, 0 par défaut')
+    parser.add_argument('-n', '--nbTour', type=int, help='Nombre d\'éxecutions de l\'algorithme génétique en cascade, 1 par défaut')
     parser.add_argument('-f', '--fitness', type=str, help='Type de fitness, argument nécessaire en cas de --type=classique')
     parser.add_argument('-e', '--empire', type=float, help='Probabilité de garder un individu, même s\'il réduit la fitness')
     parser.add_argument('-r', '--remplace', action='store_true', help='Choisir si l\'on remplace la moitiée de la population en cas de blocage ou non, par défaut à False')
@@ -46,17 +46,21 @@ def main():
     dossier = args.dossier
     remplace = args.remplace
     type_algo = args.type
-    nbTour = 0 if args.nbTour is None else args.nbTour
+    type_fit = args.fitness
+    nbTour = 1 if args.nbTour is None else args.nbTour
+
+    print(type_algo)
 
     MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv(dossier)
 
     print("Génération de la population initiale...")
-    pop_initiale = population_initiale.gen_n_solutions_uniques(nbPopInitiale, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
+    pop_initiale = population_initiale.gen_n_solutions_uniques(nbPopInitiale, INTERVENANTS, MISSIONS, MATRICE_DISTANCE)
     
     
     if type_algo == "classique":
-        pop_resultante = genetique.genetique(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, type_algo, remplace)
+        pop_resultante = genetique.genetique(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, type_fit, remplace)
     elif type_algo == "cascade":
+        print("Ok")
         pop_resultante = genetique.genetiqueCascade(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, nbTour, remplace)
     elif type_algo == "pareto":
         pop_resultante = genetique.genetiquePareto(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire)
