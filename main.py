@@ -46,17 +46,16 @@ def main():
     dossier = args.dossier
     remplace = args.remplace
     type_algo = args.type
-    type_fit = args.fitness
     nbTour = 0 if args.nbTour is None else args.nbTour
 
     MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv(dossier)
 
     print("Génération de la population initiale...")
-    pop_initiale = population_initiale.gen_n_solutions_uniques(nbPopInitiale, INTERVENANTS, MISSIONS, MATRICE_DISTANCE)
+    pop_initiale = population_initiale.gen_n_solutions_uniques(nbPopInitiale, MATRICE_DISTANCE, INTERVENANTS, MISSIONS)
     
     
     if type_algo == "classique":
-        pop_resultante = genetique.genetique(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, type_fit, remplace)
+        pop_resultante = genetique.genetique(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, type_algo, remplace)
     elif type_algo == "cascade":
         pop_resultante = genetique.genetiqueCascade(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, nbTour, remplace)
     elif type_algo == "pareto":
