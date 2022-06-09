@@ -45,6 +45,19 @@ def choixParents(fitness): #fonction qui choisit les parents à partir de leur f
     return (Parent1[0], Parent2[0])
 
 
+def choixKill(fitness):
+    """
+    Choix par roulette des parents
+    """
+    nbSol = len(fitness)
+    ponde = np.zeros(nbSol)
+    somme = 0
+    for i in range(nbSol):
+        somme += fitness[i]
+    for i in range(nbSol):
+        ponde[i] = (fitness[i] / somme)
+    kill1 = rd.choices(range(nbSol), weights=ponde, k=1)
+    return (kill1[0])
 
 
 def reproduction (solution1, solution2, ligDebut, ligFin, colDebut, colFin): #fonction qui realise la reproduction entre deux solutions
@@ -91,8 +104,8 @@ def mutation(solution):
 
 def main():
     matrice_distance, intervenants, missions = fc.charge_fichier_csv("45-4")
-    SOLUTIONS = fc.charger_solution("solutions.txt")
-    print(SOLUTIONS)
+    print(choixKill(exempleFitness2[0]))
+
 
 
 if __name__ == "__main__":
