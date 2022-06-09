@@ -4,6 +4,7 @@ import copy as cop
 import functions as fc
 import genetique as g
 import population_initiale as pop
+import paretoFront as pf
 
 
 
@@ -103,7 +104,7 @@ def mutation(solution):
     (solution[rdLine1][rdCol], solution[rdLine2][rdCol]) = (solution[rdLine2][rdCol], solution[rdLine1][rdCol])
     return solution
 
-def moyenneFitness(fitness1, fitness2, fitness3):
+def moyenneFitness_Norma(fitness1, fitness2, fitness3):
     """
     Retourne la moyenne des tableaux des Fitness
     """
@@ -114,6 +115,16 @@ def moyenneFitness(fitness1, fitness2, fitness3):
     fitness3_norma = normalisationTableaux(fitness3)
     for i in range(nbSol):
         moyenne[i] = (fitness1_norma[i] + fitness2_norma[i] + fitness3_norma[i]) / 3
+    return moyenne
+
+def moyenneFitness(fitness1, fitness2, fitness3):
+    """
+    Retourne la moyenne des tableaux des Fitness
+    """
+    nbSol = len(fitness1)
+    moyenne = np.zeros(nbSol)
+    for i in range(nbSol):
+        moyenne[i] = (fitness1[i] + fitness2[i] + fitness3[i]) / 3
     return moyenne
 
 def moyenneFit_1(mission, intervenants, solution_1,distances):
@@ -132,7 +143,10 @@ def normalisationTableaux(fitness):
     maximum = max(fitness)
     minimum = min(fitness)
     for i in range(nbSol):
-        normalise[i] = (fitness[i] - minimum) / (maximum - minimum) +1
+        if maximum == minimum:
+            normalise[i] = 1
+        else:
+            normalise[i] = (fitness[i] - minimum) / (maximum - minimum) +1
     return normalise
 
 
@@ -148,6 +162,77 @@ def remplacement(fitness_tab, sol, intervenants, missions, matrice_distance):
             solution[i] = population_remplacement[j]
             j += 1
     return solution
+
+
+def affichageClassique(solution, type, Mission, Intervenants, Distances, type_algo):
+    """
+    Affiche la solution et le fitness
+    """
+    if type_algo == "cascade":
+        fit_SE = g.choixFitness_tableau("SESSAD", Mission, Intervenants, solution, Distances)
+        fit_EM = g.choixFitness_tableau("employe", Mission, Intervenants, solution, Distances)
+        fit_ET = g.choixFitness_tableau("etudiant", Mission, Intervenants, solution, Distances)
+
+        indiceSE, bestFitSE = g.mini(fit_SE)
+        planningSE = fc.activites_intervenants(solution[indiceSE], Intervenants, Mission)
+        print("La fitness de SESSAD est : ", bestFitSE)
+        print("La solution de SESSAD est : ", solution[indiceSE])
+        print("Le planning de SESSADest :", planningSE)
+        print("\n")
+
+        indiceEM, bestFitEM = g.mini(fit_EM)
+        planning = fc.activites_intervenants(solution[indiceEM], Intervenants, Mission)
+        print("La fitness de employés est : ", bestFitEM)
+        print("La solution de employés est : ", solution[indiceEM])
+        print("Le planning de employés est:", planning)
+        print("\n")
+
+        indiceET, bestFitET = g.mini(fit_ET)
+
+        planning = fc.activites_intervenants(solution[indiceET], Intervenants, Mission)
+        print("La fitness de étudiants est : ", bestFitET)
+        print("La solution de étudiants est : ", solution[indiceET])
+        print("Le planning de étudiants est :", planning)
+        print("\n")
+
+    else:
+        if type_algo == "classique":
+            fit = g.choixFitness_tableau(type, Mission, Intervenants, solution, Distances)
+        if type_algo == "moyenne":
+            fit = moyenneFitness(g.choixFitness_tableau("employe", Mission, Intervenants, solution, Distances),
+                                 g.choixFitness_tableau("SESSAD", Mission, Intervenants, solution, Distances),
+                                 g.choixFitness_tableau("etudiant", Mission, Intervenants, solution, Distances))
+        if type_algo == "normal":
+            fit = moyenneFitness_Norma(g.choixFitness_tableau("employe", Mission, Intervenants, solution, Distances),
+                                 g.choixFitness_tableau("SESSAD", Mission, Intervenants, solution, Distances),
+                                 g.choixFitness_tableau("etudiant", Mission, Intervenants, solution, Distances))
+
+        indice, bestFit = g.mini(fit)
+        planning = fc.activites_intervenants(solution[indice], Intervenants, Mission)
+        print("La fitness de est : ", bestFit)
+        print("La solution de est : ", solution[indice])
+        print("Le planning est :", planning)
+        print("\n")
+
+
+def affichagePareto(solution, Mission, Intervenants, Distances):
+    fit_SE = g.choixFitness_tableau("SESSAD", Mission, Intervenants, solution, Distances)
+    fit_EM = g.choixFitness_tableau("employe", Mission, Intervenants, solution, Distances)
+    fit_ET = g.choixFitness_tableau("etudiant", Mission, Intervenants, solution, Distances)
+    pare = pf.pareto_frontier_multi(fit_ET, fit_EM, fit_SE)
+    sol = pare[3]
+    print(solution[sol[1]])
+    for i in range(len(sol)):
+        fit_SE = g.choixFitness_1("SESSAD", Mission, Intervenants, solution[sol[i]], Distances)
+        fit_EM = g.choixFitness_1("employe", Mission, Intervenants, solution[sol[i]], Distances)
+        fit_ET = g.choixFitness_1("etudiant", Mission, Intervenants, solution[sol[i]], Distances)
+        planning = fc.activites_intervenants(solution[sol[i]], Intervenants, Mission)
+        print("La fitness de SESSAD est : ", fit_SE)
+        print("La fitness de étudiants est : ", fit_ET)
+        print("La fitness de employés est : ", fit_EM)
+        print("La solution est : ", solution[sol[i]])
+        print("Le planning est :", planning)
+        print("\n")
 
 
 def main():

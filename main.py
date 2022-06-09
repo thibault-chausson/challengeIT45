@@ -4,6 +4,7 @@ import genetique
 import fitnessSESSAD
 import fitnessEmployes
 import argparse
+import tools as tls
 
 from functions import *
 
@@ -49,7 +50,6 @@ def main():
     type_fit = args.fitness
     nbTour = 1 if args.nbTour is None else args.nbTour
 
-    print(type_algo)
 
     MATRICE_DISTANCE, INTERVENANTS, MISSIONS = charge_fichier_csv(dossier)
 
@@ -59,15 +59,19 @@ def main():
     
     if type_algo == "classique":
         pop_resultante = genetique.genetique(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, type_fit, remplace)
+        tls.affichageClassique(pop_resultante, type_fit, MISSIONS, INTERVENANTS, MATRICE_DISTANCE, "classique")
     elif type_algo == "cascade":
-        print("Ok")
         pop_resultante = genetique.genetiqueCascade(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, nbTour, remplace)
+        tls.affichageClassique(pop_resultante, type_fit, MISSIONS, INTERVENANTS, MATRICE_DISTANCE, "cascade")
     elif type_algo == "pareto":
         pop_resultante = genetique.genetiquePareto(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire)
+        tls.affichagePareto(pop_resultante, MISSIONS, INTERVENANTS, MATRICE_DISTANCE)
     elif type_algo == "moyenne":
         pop_resultante = genetique.genetiqueMoyenne(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, remplace)
+        tls.affichageClassique(pop_resultante, type_fit, MISSIONS, INTERVENANTS, MATRICE_DISTANCE, "moyenne")
     elif type_algo == "normalisee":
         pop_resultante = genetique.genetiqueMoyenneNorma(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, remplace)
+        tls.affichageClassique(pop_resultante, type_fit, MISSIONS, INTERVENANTS, MATRICE_DISTANCE, "normal")
     else:
         print("Erreur: type d'algorithme non reconnu")
         sys.exit(1)
