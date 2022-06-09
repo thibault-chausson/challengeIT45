@@ -436,6 +436,108 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
     return solutions
 
 
+def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
+    # Initialisation de la population
+
+    nbGene = 0
+    nbPlanning = len(solutions)
+    nbInter = len(intervenants)
+    nbMis = len(mission)
+    tableau_fit_moy = tls.moyenneFitness(choixFitness_tableau("employe", mission, intervenants, solutions, distances), choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances), choixFitness_tableau("etudiant", mission, intervenants, solutions, distances))
+    secu = 0
+    geneCons = 0
+    while nbGene < nbGeneration and secu < 10000:
+        print(f"Génération:\t{nbGene}/{nbGeneration}", end='\r')
+        # On choisie les deux parents
+        normalise = tls.normalisationTableaux(tableau_fit_moy)
+        parent1, parent2 = tls.choixParents(normalise)
+        # On crée un enfant
+        finCol = rd.randint(1, nbMis - 1)
+        fille1 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
+        fille2 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, finCol, nbMis - 1)
+        # On choisie ce que l'on va faire avec les enfants, s'il est valide ou non
+
+        valideFille1 = fct.contraintes(fille1, mission, intervenants, distances)
+        valideFille2 = fct.contraintes(fille2, mission, intervenants, distances)
+
+        if valideFille1:
+            # Si l'enfant est valide on remplace le pire de la population par l'enfant
+            fitnessFille1 = tls.moyenneFit_1(mission, intervenants, fille1,distances)
+            aux = np.append(tableau_fit_moy, fitnessFille1)
+            aux_norma = tls.normalisationTableaux(aux)
+            fitnessFille1_norma = aux_norma[-1]
+            aux_norma_sans = np.delete(aux_norma, -1)
+            indice = tls.choixKill(aux_norma_sans)
+            # indice, max = maxiFit(tableau_fit)
+            # if fitnessFille1 < max:
+            if fitnessFille1_norma < aux_norma_sans[indice]:
+                solutions[indice] = fille1
+                tableau_fit_moy[indice] = fitnessFille1
+                geneCons += 1
+
+        if valideFille2:
+            # Si l'enfant est valide on remplace le pire de la population par l'enfant
+            fitnessFille2 = tls.moyenneFit_1(mission, intervenants, fille2, distances)
+            aux = np.append(tableau_fit_moy, fitnessFille2)
+            aux_norma = tls.normalisationTableaux(aux)
+            fitnessFille2_norma = aux_norma[-1]
+            aux_norma_sans = np.delete(aux_norma, -1)
+            indice = tls.choixKill(aux_norma_sans)
+            # indice, max = maxiFit(tableau_fit)
+            # if fitnessFille2 < max:
+            if fitnessFille2_norma < aux_norma_sans[indice]:
+                solutions[indice] = fille2
+                tableau_fit_moy[indice] = fitnessFille2
+                geneCons += 1
+
+        ## On fait une mutation
+        # On choisit une solution
+
+        if rd.random() < probaMutation:
+            # On choisit de faire une mutation
+            solutionChoisie = rd.randint(0, nbPlanning - 1)
+
+            mutate = tls.mutation(solutions[solutionChoisie])
+            valideMutate = fct.contraintes(mutate, mission, intervenants, distances)
+
+            if valideMutate:
+
+                fitnessMutation = tls.moyenneFit_1(mission, intervenants, mutate, distances)
+                aux = np.append(tableau_fit_moy, fitnessMutation)
+                aux_norma = tls.normalisationTableaux(aux)
+                fitnessMutation_norma = aux_norma[-1]
+                aux_norma_sans = np.delete(aux_norma, -1)
+                fitnessChoisiePourMutationNorma = aux_norma_sans[solutionChoisie]
+
+                # Si la mutation est valide
+                empire = rd.random()
+                fitnessMutate = tls.moyenneFit_1(mission, intervenants, mutate, distances)
+                if empire > probaMissionEmpire:
+                    # Si elle améliore le fitness de la solution choisie on met à jour la solution
+                    if fitnessMutation_norma < fitnessChoisiePourMutationNorma:
+                        solutions[solutionChoisie] = mutate
+                        tableau_fit_moy[solutionChoisie] = fitnessMutate
+                else:
+                    # Si elle n'améliore pas le fitness de la solution choisie on met à jour seulement si on a le droit d'empirer la solution
+                    solutions[solutionChoisie] = mutate
+                    tableau_fit_moy[solutionChoisie] = fitnessMutate
+
+        if valideFille1 or valideFille2:
+            nbGene += 1
+            secu = 0
+        else:
+            nbGene = nbGene
+            secu += 1
+
+    if secu > 9998:
+        print("Nombre de générations faites :", nbGene)
+        print("Arret de la recherche")
+
+    print("Nombre de générations conservées :", geneCons)
+
+    return solutions
+
+
 def genetiqueMoyenne(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
     # Initialisation de la population
 
@@ -531,7 +633,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(soll, missions, intervenants)))
     debut = ti.time()
-    apres = genetiqueMoyenne(soll, 20000, 0.2, matrice_distance, intervenants, missions, 0.01)
+    apres = genetiqueMoyenneNorma(soll, 70000, 0.2, matrice_distance, intervenants, missions, 0.01)
     fin = ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(missions, intervenants, apres, matrice_distance)))

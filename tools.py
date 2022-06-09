@@ -18,6 +18,10 @@ exempleFitness = [[12, 98, 56, 9, 152, 64, 567, 74, 989],
                   [12, 98, 56, 9, 152, 64, 567, 74, 989]
                   ]
 
+normaTes =[0.00306122, 0.09081633, 0.04795918, 0. ,        0.14591837, 0.05612245,
+ 0.56938776, 0.06632653, 989        ]
+
+
 exemple=[[1,2,3,4],
          [5,6,7,8],
          [9,10,11,12],
@@ -106,18 +110,35 @@ def moyenneFitness(fitness1, fitness2, fitness3):
     """
     nbSol = len(fitness1)
     moyenne = np.zeros(nbSol)
+    fitness1_norma = normalisationTableaux(fitness1)
+    fitness2_norma = normalisationTableaux(fitness2)
+    fitness3_norma = normalisationTableaux(fitness3)
     for i in range(nbSol):
-        moyenne[i] = (fitness1[i] + fitness2[i] + fitness3[i]) / 3
+        moyenne[i] = (fitness1_norma[i] + fitness2_norma[i] + fitness3_norma[i]) / 3
     return moyenne
 
 def moyenneFit_1(mission, intervenants, solution_1,distances):
-    return (g.choixFitness_1("employe", mission, intervenants, solution_1,distances) + g.choixFitness_1("etudiant", mission, intervenants, solution_1,distances) + g.choixFitness_1("SESSAD", mission, intervenants, solution_1,distances))/3
+    empl = g.choixFitness_1("employe", mission, intervenants, solution_1,distances)
+    etu = g.choixFitness_1("etudiant", mission, intervenants, solution_1,distances)
+    sess = g.choixFitness_1("SESSAD", mission, intervenants, solution_1,distances)
+    return ( empl+ etu + sess)/3
 
 
+def normalisationTableaux(fitness):
+    """
+    Retourne le tableau normalisé
+    """
+    nbSol = len(fitness)
+    normalise = np.zeros(nbSol)
+    maximum = max(fitness)
+    minimum = min(fitness)
+    for i in range(nbSol):
+        normalise[i] = (fitness[i] - minimum) / (maximum - minimum) +1
+    return normalise
 
 def main():
     matrice_distance, intervenants, missions = fc.charge_fichier_csv("45-4")
-    print(choixKill(exempleFitness2[0]))
+    print(normalisationTableaux(exempleFitness[0]))
 
 
 
