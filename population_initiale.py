@@ -163,6 +163,7 @@ def gen_n_solutions_uniques(n, Inter, Miss, mat_dis):
             if i not in toutes_les_solutions:
                 toutes_les_solutions.append(i)
 
+    rd.shuffle(toutes_les_solutions)
     return toutes_les_solutions[:n]
 
 
