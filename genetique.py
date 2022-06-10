@@ -246,6 +246,7 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
     tableau_fit_Se = choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances)
     secu = 0
     geneCons = 0
+
     while nbGene < nbGeneration and secu < nbGeneration:
         print(f"Génération:\t{nbGene}/{nbGeneration}", end='\r')
         # On choisie les deux parents
