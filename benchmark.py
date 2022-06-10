@@ -29,9 +29,11 @@ def duree(deb, nbPopMax, pas, matrice_distance, intervenants, missions, type, so
     print(len(sol[0]))
     temps = [0]
     x = [0]
+
     for i in range(deb, nbPopMax, pas):
+        sol2 = copy.deepcopy(sol)
         debut = ti.time()
-        gene.genetiqueMoyenneNorma(sol, i, 0.1, matrice_distance, intervenants, missions, 0.0, True)
+        gene.genetiquePareto(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.0)
         fin = ti.time()
         x.append(i)
         temps.append(fin - debut)
@@ -58,7 +60,8 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
     x = [0]
     indice = 0
     for i in range(deb, nbPopMax + pas, pas):
-        sol = gene.genetique(sol, i, 0.07, matrice_distance, intervenants, missions, 0.00, type, True)
+        sol2 = copy.deepcopy(sol)
+        gene.genetique(sol2, i, 0.07, matrice_distance, intervenants, missions, 0.00, type, True)
         finFit = min(gene.choixFitness_tableau(type, missions, intervenants, sol, matrice_distance))
         fit.append(finFit)
         x.append(x[indice] + i)
