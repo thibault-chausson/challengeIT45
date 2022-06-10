@@ -31,16 +31,17 @@ def duree(deb, nbPopMax, pas, matrice_distance, intervenants, missions, type, so
     print(len(sol[0]))
     temps = [0]
     x = [0]
-
+    indice = 0
     for i in range(deb, nbPopMax, pas):
         sol2 = copy.deepcopy(sol)
         debut = ti.time()
-        gene.genetiquePareto(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.0)
+        sol = gene.genetique(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.0, "employe", True)
         fin = ti.time()
-        x.append(i)
-        temps.append(fin - debut)
+        x.append(x[indice] + i)
+        temps.append(temps[indice] + fin - debut)
+        indice += 1
 
-    plt.plot(x, temps)
+    plt.scatter(x, temps)
     plt.xlabel("Générations")
     plt.ylabel("Temps en secondes")
     plt.title("Evolution du temps de calcul en fonction du nombre de générations")
@@ -64,7 +65,7 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
     indice = 0
     sol2 = copy.deepcopy(sol)
     for i in range(deb, nbPopMax + pas, pas):
-        sol3 = copy.deepcopy(gene.genetiqueCascade(sol2, i, 0.07, matrice_distance, intervenants, missions, 0.00, 3, True))
+        sol3 = copy.deepcopy(gene.genetique(sol2, i, 0.07, matrice_distance, intervenants, missions, 0.00, "SESSAD", True))
         sol2 = copy.deepcopy(sol3)
         fit_1 = min(gene.choixFitness_tableau("etudiant", missions, intervenants, sol2, matrice_distance))
         fit_2 = min(gene.choixFitness_tableau("employe", missions, intervenants, sol2, matrice_distance))
@@ -78,7 +79,7 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
     fig = plt.figure()
 
     subplot1 = fig.add_subplot(2, 1, 2)
-    subplot1.plot(x, fit_Et)
+    subplot1.scatter(x, fit_Et)
 
     subplot1.set_ylabel('Fitness étudiants')
     subplot1.set_title('Étudiants')
@@ -86,19 +87,19 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
 
 
     subplot2 = fig.add_subplot(2, 2, 1)
-    subplot2.plot(x, fit_Em,  color="green")
-    subplot2.set_ylabel('Fitness employes')
+    subplot2.scatter(x, fit_Em,  color="green")
+    subplot2.set_ylabel('Fitness employés')
     subplot2.set_xlabel('Générations')
-    subplot2.set_title('Employes')
+    subplot2.set_title('Employés')
 
     subplot3 = fig.add_subplot(2,2,2)
-    subplot3.plot(x, fit_Se,  color="red")
+    subplot3.scatter(x, fit_Se,  color="red")
     subplot3.set_ylabel('Fitness SESSAD')
     subplot3.set_xlabel('Générations')
     subplot3.set_title('SESSAD')
 
 
-    fig.suptitle("Évolution de la fitness pour l'agorithme en cascade en fonction du nombre de générations")
+    fig.suptitle("Évolution de la fitness SESSAD pour l'agorithme en fonction du nombre de générations")
 
 
 
@@ -135,7 +136,7 @@ def tempsGenePopu (geneMin, geneMax, pas, intervenants, missions, distance):
         x.append(i)
         temps.append(end_time-start_time)
 
-    plt.plot(x, temps)
+    plt.scatter(x, temps)
     plt.xlabel("Taille de la population")
     plt.ylabel("Temps en secondes")
     plt.title("Évolution du temps pour générer une population initiale")
@@ -150,12 +151,13 @@ def tempsGenePopu (geneMin, geneMax, pas, intervenants, missions, distance):
 
 def main():
 
-    distance, intervenants, missions = f.charge_fichier_csv("45-4")
-    solutions = pop.gen_n_solutions_uniques(100, intervenants, missions, distance)
+    distance, intervenants, missions = f.charge_fichier_csv("100-10")
+    #solutions = pop.gen_n_solutions_uniques(100, intervenants, missions, distance)
     #tempsGenePopu(5, 150, 10)
-    deb, nbPopMax, pas = 10, 400, 10
-    print(nbSolutionnn(deb, nbPopMax, pas))
-    evolutionFit(deb, nbPopMax, pas, "SESSAD", distance, intervenants, missions, solutions)
+    deb, nbPopMax, pas = 10, 200, 20
+    #print(nbSolutionnn(deb, nbPopMax, pas))
+    #duree(deb, nbPopMax, pas, distance, intervenants, missions, "", solutions)
+    tempsGenePopu(deb, nbPopMax, pas, intervenants, missions, distance)
 
 
 
