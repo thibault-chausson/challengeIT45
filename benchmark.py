@@ -12,6 +12,10 @@ import population_initiale as pI
 
 import functions as f
 
+import population_initiale as pop
+
+import copy as copy
+
 
 
 
@@ -25,13 +29,11 @@ def duree(deb, nbPopMax, pas, matrice_distance, intervenants, missions, type, so
     print(len(sol[0]))
     temps = [0]
     x = [0]
-    indice = 0
-    debut = ti.time()
-    for i in range(deb, nbPopMax + pas, pas):
-        sol = gene.genetique(sol, i, 0.07, matrice_distance, intervenants, missions, 0.00, type)
+    for i in range(deb, nbPopMax, pas):
+        debut = ti.time()
+        gene.genetiqueMoyenneNorma(sol, i, 0.1, matrice_distance, intervenants, missions, 0.0, True)
         fin = ti.time()
-        x.append(x[indice] + i)
-        indice += 1
+        x.append(i)
         temps.append(fin - debut)
 
     plt.plot(x, temps)
@@ -56,7 +58,7 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
     x = [0]
     indice = 0
     for i in range(deb, nbPopMax + pas, pas):
-        sol = gene.genetique(sol, i, 0.07, matrice_distance, intervenants, missions, 0.00, type)
+        sol = gene.genetique(sol, i, 0.07, matrice_distance, intervenants, missions, 0.00, type, True)
         finFit = min(gene.choixFitness_tableau(type, missions, intervenants, sol, matrice_distance))
         fit.append(finFit)
         x.append(x[indice] + i)
@@ -85,12 +87,12 @@ def nbSolutionnn(deb, nbPopMax, pas):
     return x[-1]
 
 
-def tempsGenePopu (geneMin, geneMax, pas):
+def tempsGenePopu (geneMin, geneMax, pas, intervenants, missions, distance):
     x=[]
     temps=[]
     for i in range(geneMin, geneMax, pas):
         start_time = ti.time()
-        pI.gen_n_solutions_uniques(i)
+        pI.gen_n_solutions_uniques(i, intervenants, missions, distance)
         end_time = ti.time()
         x.append(i)
         temps.append(end_time-start_time)
@@ -109,10 +111,11 @@ def tempsGenePopu (geneMin, geneMax, pas):
 
 
 def main():
+
     distance, intervenants, missions = f.charge_fichier_csv("45-4")
+    solutions = pop.gen_n_solutions_uniques(100, intervenants, missions, distance)
     #tempsGenePopu(5, 150, 10)
-    solutions = f.charger_solution("solutions.txt")
-    deb, nbPopMax, pas = 10, 90, 2
+    deb, nbPopMax, pas = 100, 4000, 200
     print(nbSolutionnn(deb, nbPopMax, pas))
     x, y = duree(deb, nbPopMax, pas, distance, intervenants, missions, "employe", solutions)
 
