@@ -100,16 +100,15 @@ def contraintes(solution, Mis, Int, Dis):
     # on ignore cette contrainte pour le moment
 
     # 6.  Respecter les heures maximales a travailler par jour (Temps Plein = 8h/jour, Temps partiel = 6h/jour)
-    """ Contrainte bizarre, a éclaircir.
-    for i in range(len(INTERVENANTS)):
+    for i in range(len(Int)):
         temps_travaille = {1:0, 2:0, 3:0, 4:0, 5:0}
-        for j in range(len(MISSIONS)):
+        for j in range(len(Mis)):
             if solution[i][j] == 1:
-                temps_travaille[MISSIONS[j][1]] += MISSIONS[j][3] - MISSIONS[j][2]
-        for k in temps_travaille:
-            if not (360 < temps_travaille[k] < 480):
+                temps_travaille[Mis[j][1]] += Mis[j][3] - Mis[j][2]
+        
+        for x in temps_travaille:
+            if (temps_travaille[x] > 480 and Int[i][3] == 35) or (temps_travaille[x] > 360 and Int[i][3] == 24):
                 return False
-    """
 
     # 7.  Respecter la limite des heures supplementaires autorisees a travailler par les intervenants sur le plan de planification (heures supplementaires = 10h/semaine, 2h/jour)
     # a modifier si on integre le délire de travail a mis temps / plein temps
@@ -186,5 +185,4 @@ def activites_intervenants(solution, Int, Mis):
         miss_intervenants.append(edt)
 
     return miss_intervenants
-
 
