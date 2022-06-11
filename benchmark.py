@@ -151,13 +151,14 @@ def tempsGenePopu (geneMin, geneMax, pas, intervenants, missions, distance):
 
 def main():
 
-    distance, intervenants, missions = f.charge_fichier_csv("100-10")
-    #solutions = pop.gen_n_solutions_uniques(100, intervenants, missions, distance)
+    distance, intervenants, missions = f.charge_fichier_csv("45-4")
+    solutions = pop.gen_n_solutions_uniques(100, intervenants, missions, distance)
     #tempsGenePopu(5, 150, 10)
-    deb, nbPopMax, pas = 10, 200, 20
-    #print(nbSolutionnn(deb, nbPopMax, pas))
+    deb, nbPopMax, pas = 10, 600, 20
+    print(nbSolutionnn(deb, nbPopMax, pas))
     #duree(deb, nbPopMax, pas, distance, intervenants, missions, "", solutions)
-    tempsGenePopu(deb, nbPopMax, pas, intervenants, missions, distance)
+    #tempsGenePopu(deb, nbPopMax, pas, intervenants, missions, distance)
+    evolutionFit(deb, nbPopMax, pas, type, distance, intervenants, missions, solutions)
 
 
 
