@@ -35,7 +35,7 @@ def duree(deb, nbPopMax, pas, matrice_distance, intervenants, missions, type, so
     for i in range(deb, nbPopMax, pas):
         sol2 = copy.deepcopy(sol)
         debut = ti.time()
-        sol = gene.genetique(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.0, "employe", True)
+        sol = gene.genetiqueMoyenneNorma(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.0, True)
         fin = ti.time()
         x.append(x[indice] + i)
         temps.append(temps[indice] + fin - debut)
@@ -65,7 +65,7 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
     indice = 0
     sol2 = copy.deepcopy(sol)
     for i in range(deb, nbPopMax + pas, pas):
-        sol3 = copy.deepcopy(gene.genetique(sol2, i, 0.07, matrice_distance, intervenants, missions, 0.00, "SESSAD", True))
+        sol3 = copy.deepcopy(gene.genetiqueMoyenneNorma(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.00, True))
         sol2 = copy.deepcopy(sol3)
         fit_1 = min(gene.choixFitness_tableau("etudiant", missions, intervenants, sol2, matrice_distance))
         fit_2 = min(gene.choixFitness_tableau("employe", missions, intervenants, sol2, matrice_distance))
@@ -156,9 +156,9 @@ def main():
     #tempsGenePopu(5, 150, 10)
     deb, nbPopMax, pas = 10, 600, 20
     print(nbSolutionnn(deb, nbPopMax, pas))
-    #duree(deb, nbPopMax, pas, distance, intervenants, missions, "", solutions)
+    duree(deb, nbPopMax, pas, distance, intervenants, missions, "", solutions)
     #tempsGenePopu(deb, nbPopMax, pas, intervenants, missions, distance)
-    evolutionFit(deb, nbPopMax, pas, type, distance, intervenants, missions, solutions)
+    #evolutionFit(deb, nbPopMax, pas, type, distance, intervenants, missions, solutions)
 
 
 
