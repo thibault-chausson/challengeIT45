@@ -147,7 +147,8 @@ def genetique(solution, nbGeneration, probaMutation, distances, intervenants, mi
                         solutions[solutionChoisie] = mutate
                         tableau_fit[solutionChoisie] = fitnessMutate
                 else:
-                    # Si elle n'améliore pas le fitness de la solution choisie on met à jour seulement si on a le droit d'empirer la solution
+                    # Si elle n'améliore pas le fitness de la solution choisie on met à jour seulement si on a le
+                    # droit d'empirer la solution
                     solutions[solutionChoisie] = mutate
                     tableau_fit[solutionChoisie] = fitnessMutate
 
@@ -297,40 +298,6 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
                     tableau_fit_Se[indice] = fitnessFille1_SE
                     geneCons += 1
 
-            """
-            indiceKill = choixParentsParetoKill(tableau_fit_Em, tableau_fit_Et, tableau_fit_Se, solutions)
-            if fitnessFille1_EM < tableau_fit_Em[indiceKill] and fitnessFille1_Et < tableau_fit_Et[indiceKill] and fitnessFille1_SE < tableau_fit_Se[indiceKill]:
-                solutions[indiceKill] = fille1
-                tableau_fit_Em[indiceKill] = fitnessFille1_EM
-                tableau_fit_Et[indiceKill] = fitnessFille1_Et
-                tableau_fit_Se[indiceKill] = fitnessFille1_SE 
-            """
-
-            """
-            indice_Em, max_Em = maxiFit(tableau_fit_Em)
-            indice_Et, max_Et = maxiFit(tableau_fit_Et)
-            indice_SE, max_SE = maxiFit(tableau_fit_Se)
-
-            # Si l'enfant est meilleur toutes les fitness on choisit une fitness au hasard et on concerve l'enfant
-            if fitnessFille1_EM < max_Em and fitnessFille1_Et < max_Et and fitnessFille1_SE < max_SE:
-                ran1 = rd.randint(1, 3)
-                if ran1 == 1:
-                    solutions[indice_Em] = fille1
-                    tableau_fit_Em[indice_Em] = fitnessFille1_EM
-                    tableau_fit_Et[indice_Em] = fitnessFille1_Et
-                    tableau_fit_Se[indice_Em] = fitnessFille1_SE
-                if ran1 == 2:
-                    solutions[indice_Et] = fille1
-                    tableau_fit_Em[indice_Et] = fitnessFille1_EM
-                    tableau_fit_Et[indice_Et] = fitnessFille1_Et
-                    tableau_fit_Se[indice_Et] = fitnessFille1_SE
-                if ran1 == 3:
-                    solutions[indice_SE] = fille1
-                    tableau_fit_Em[indice_SE] = fitnessFille1_EM
-                    tableau_fit_Et[indice_SE] = fitnessFille1_Et
-                    tableau_fit_Se[indice_SE] = fitnessFille1_SE
-            """
-
         if valideFille2:
             fitnessFille2_EM = choixFitness_1("employe", mission, intervenants, fille2, distances)
             fitnessFille2_Et = choixFitness_1("etudiant", mission, intervenants, fille2, distances)
@@ -365,40 +332,6 @@ def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervena
                     tableau_fit_Et[indice] = fitnessFille2_Et
                     tableau_fit_Se[indice] = fitnessFille2_SE
                     geneCons += 1
-
-            """ 
-            indiceKill = choixParentsParetoKill(tableau_fit_Em, tableau_fit_Et, tableau_fit_Se, solutions)
-            if fitnessFille2_EM < tableau_fit_Em[indiceKill] and fitnessFille2_Et < tableau_fit_Et[indiceKill] and fitnessFille2_SE < tableau_fit_Se[indiceKill]:
-                solutions[indiceKill] = fille2
-                tableau_fit_Em[indiceKill] = fitnessFille2_EM
-                tableau_fit_Et[indiceKill] = fitnessFille2_Et
-                tableau_fit_Se[indiceKill] = fitnessFille2_SE
-            """
-
-            """
-            indice2_Em, max2_Em = maxiFit(tableau_fit_Em)
-            indice2_Et, max2_Et = maxiFit(tableau_fit_Et)
-            indice2_SE, max2_SE = maxiFit(tableau_fit_Se)
-            # Si l'enfant est meilleur toutes les fitness on choisit une fitness au hasard et on concerve l'enfant
-            if fitnessFille2_EM < max2_Em and fitnessFille2_Et < max2_Et and fitnessFille2_SE < max2_SE:
-                ran = rd.randint(1, 3)
-                if ran == 1:
-                    solutions[indice2_Em] = fille2
-                    tableau_fit_Em[indice2_Em] = fitnessFille2_EM
-                    tableau_fit_Et[indice2_Em] = fitnessFille2_Et
-                    tableau_fit_Se[indice2_Em] = fitnessFille2_SE
-                if ran == 2:
-                    solutions[indice2_Et] = fille2
-                    tableau_fit_Em[indice2_Et] = fitnessFille2_EM
-                    tableau_fit_Et[indice2_Et] = fitnessFille2_Et
-                    tableau_fit_Se[indice2_Et] = fitnessFille2_SE
-                if ran == 3:
-                    solutions[indice2_SE] = fille2
-                    tableau_fit_Em[indice2_SE] = fitnessFille2_EM
-                    tableau_fit_Et[indice2_SE] = fitnessFille2_Et
-                    tableau_fit_Se[indice2_SE] = fitnessFille2_SE
-
-            """
 
         ## On fait une mutation
         # On choisit une solution
@@ -494,8 +427,6 @@ def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, int
                 fitnessSe[indice] = fitnessFille1Se
                 geneCons += 1
 
-
-
         if valideFille2:
             # Si l'enfant est valide on remplace le pire de la population par l'enfant
             fitnessFille2Em = choixFitness_1("employe", mission, intervenants, fille2, distances)
@@ -516,8 +447,6 @@ def genetiqueMoyenneNorma(solutions, nbGeneration, probaMutation, distances, int
                 fitnessEt[indice] = fitnessFille2Et
                 fitnessSe[indice] = fitnessFille2Se
                 geneCons += 1
-
-
 
         ## On fait une mutation
         # On choisit une solution
@@ -648,7 +577,8 @@ def genetiqueMoyenne(solutions, nbGeneration, probaMutation, distances, interven
                         solutions[solutionChoisie] = mutate
                         tableau_fit_moy[solutionChoisie] = fitnessMutate
                 else:
-                    # Si elle n'améliore pas le fitness de la solution choisie on met à jour seulement si on a le droit d'empirer la solution
+                    # Si elle n'améliore pas le fitness de la solution choisie on met à jour seulement si on a le
+                    # droit d'empirer la solution
                     solutions[solutionChoisie] = mutate
                     tableau_fit_moy[solutionChoisie] = fitnessMutate
 

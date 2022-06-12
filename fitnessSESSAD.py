@@ -3,7 +3,6 @@ import fitnessEmployes as fE
 import functions as f
 
 
-
 def sumWOH_1(solution, inter, mis):
     """
     Renvoie la somme des WOH (heures non travaillées) des missions effectues par chaque intervenant
@@ -67,7 +66,6 @@ def fitnessSESSAD(solution, dist_1_Semaine, inter, mis, matrice_distance):
     return f
 
 
-
 def fitnessSESSAD_tout(mission, inter, solutions, dist):
     """
     Renvoie la fitness SESSAD pour toutes les solutions
@@ -78,7 +76,3 @@ def fitnessSESSAD_tout(mission, inter, solutions, dist):
         dis1 = fE.distance_employe(f.activites_intervenants(solutions[i], inter, mission), dist)
         fit[i] = fitnessSESSAD(solutions[i], dis1, inter, mission, dist)
     return fit
-
-
-
-
