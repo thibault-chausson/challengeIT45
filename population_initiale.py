@@ -151,7 +151,6 @@ def gen_n_solutions_uniques(n, Inter, Miss, mat_dis):
     Génère n solutions aléatoires.
     Retourne une liste des n solutions.
     """
-    print()
     toutes_les_solutions = []
     while len(toutes_les_solutions) < n:
         solutions = []
@@ -163,19 +162,9 @@ def gen_n_solutions_uniques(n, Inter, Miss, mat_dis):
         for i in solutions:
             if i not in toutes_les_solutions:
                 toutes_les_solutions.append(i)
-        print("Population initiale: {}/{}".format(len(toutes_les_solutions), n), end="\r")
-    print()
+
     rd.shuffle(toutes_les_solutions)
     return toutes_les_solutions[:n]
 
-
-def fichier_sol(nbIndividu, matrice_distance, intervenants, missions):
-    start_time = time.time()
-    solutions = gen_n_solutions_uniques(nbIndividu, intervenants, missions, matrice_distance)
-    print("Temps d'execution: {} secondes pour {} solutions".format(time.time() - start_time, len(solutions)))
-
-    with open("solutions.txt", "w") as f:
-        for i in solutions:
-            f.write(str(i) + "\n\n")
 
 
