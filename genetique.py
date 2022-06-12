@@ -237,6 +237,20 @@ def choixParentsParetoKill(tableau_fit1, tableau_fit2, tableau_fit3, solutions):
     return indiceKill1
 
 
+def choixParentsParetoKill2(tableau_fit1, tableau_fit2, tableau_fit3, solutions):
+    """
+    On execute le font de Pareto et on choisit les parents dans ce front
+    """
+    x, y, z, sol = pf.pareto_frontier_multi(tableau_fit1, tableau_fit2, tableau_fit3)
+    solFinale = []
+    for i in range(len(solutions)):
+        if i not in sol:
+            solFinale.append(i)
+    taille = len(solFinale)
+    indice = rd.randint(0, taille - 1)
+    return solFinale[indice]
+
+
 def genetiquePareto(solutions, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire):
     nbGene = 0
     nbPlanning = len(solutions)
