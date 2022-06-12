@@ -151,8 +151,10 @@ def gen_n_solutions_uniques(n, Inter, Miss, mat_dis):
     Génère n solutions aléatoires.
     Retourne une liste des n solutions.
     """
+    print()
     toutes_les_solutions = []
     while len(toutes_les_solutions) < n:
+        print("Population initiale: {}/{}".format(len(toutes_les_solutions), n), end="\r")
         solutions = []
         for i in range(len(Inter)):
             for j in range(len(Miss)):
@@ -162,7 +164,7 @@ def gen_n_solutions_uniques(n, Inter, Miss, mat_dis):
         for i in solutions:
             if i not in toutes_les_solutions:
                 toutes_les_solutions.append(i)
-
+    print("Population initiale: {}/{}\n".format(len(toutes_les_solutions), n), end="\r")
     rd.shuffle(toutes_les_solutions)
     return toutes_les_solutions[:n]
 
