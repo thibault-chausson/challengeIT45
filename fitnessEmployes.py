@@ -1,9 +1,6 @@
 import numpy as np
 
 
-
-
-
 def stats_heures(solution, intervenant, mission):
     """
     Renvoies des informations sur le nombre d'heures travaillées par les intervenants
@@ -25,48 +22,6 @@ def stats_heures(solution, intervenant, mission):
             nb_heureSup[i] = abs(tps)
 
     return nb_heuresTravaille, nb_heuresNonTravaille, nb_heureSup
-
-
-"""
-def 
-
-(missions, inter, solution_1_planning): #tableau des heures travaillées pour un planning (tableau pour chaque inter)
-    nbHeuresTravaille = np.zeros(len(inter))
-    for j in range(len(inter)):
-        for k in range(len(missions)):
-            if (solution_1_planning[j][k] == 1):
-                nbHeuresTravaille[j] += (missions[k][3] - missions[k][2]) / 60
-    return nbHeuresTravaille
-
-
-def nombre_heures_non_travaillée_et_sup(nbHeuresTravaille, inter):
-    nbHeuresNonTravaillee = np.zeros(len(INTERVENANTS))
-    nbHeuresSup = np.zeros(len(INTERVENANTS))
-    for j in range(len(INTERVENANTS)):
-        heure = INTERVENANTS[j][3] - nbHeuresTravaille[j]
-        if (heure > 0):
-            nbHeuresNonTravaillee[j] = heure
-        else:
-            nbHeuresSup[j] = abs(heure)
-    return nbHeuresNonTravaillee, nbHeuresSup
-
-
-def ecart_type(tableau):
-    nb = len(tableau)
-    sol = np.zeros(nb)
-    for i in range(nb):
-        sol[i] = st.pstdev(tableau[i])
-    return sol
-
-def distance_employs_toutes_missions (solutions, DISTANCES,inter,mis):
-    distance_employe = []
-    for i in range(len(solutions)):
-        planning = activites_intervenants(solutions[i],inter,mis)
-        distance_employe.append(distance_employé(DISTANCES, planning))
-    return distance_employe
-"""
-
-
 
 
 def distance_employe(planning_1_mission, distance_matrice):
@@ -136,6 +91,3 @@ def fitnessEm(ecart_WH, ecart_OH, ecart_D, intervenants, distance):
     Renvoie la valeur de la fonction de fitness pour les employés
     """
     return (zeta(intervenants) * ecart_WH + gamma() * ecart_OH + kapa(distance, intervenants) * ecart_D) / 3
-
-
-
