@@ -618,6 +618,124 @@ def genetiqueMoyenne(solutions, nbGeneration, probaMutation, distances, interven
     return solutions
 
 
+
+def genetiqueCascade_fit(solution, nbGeneration, probaMutation, distances, intervenants, mission, probaMissionEmpire, colon):
+    # Initialisation de la population
+
+    solutions = cp.deepcopy(solution)
+    nbGene = 0
+    nbPlanning = len(solutions)
+    nbInter = len(intervenants)
+    nbMis = len(mission)
+
+    tableau_fitEm = choixFitness_tableau("employe", mission, intervenants, solutions, distances)
+    tableau_fitSess = choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances)
+    tableau_fitEtu = choixFitness_tableau("etudiant", mission, intervenants, solutions, distances)
+
+    secu = 0
+    geneCons = 0
+    while nbGene < nbGeneration and secu < nbGeneration:
+        print(f"Génération:\t{nbGene}/{nbGeneration}", end='\r')
+        # On choisie les deux parents
+        parent1, parent2 = tls.choixParents(tableau_fitEm)
+        # On crée un enfant
+        finCol = rd.randint(1, nbMis - 1)
+        fille1 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, 0, finCol - 1)
+        fille2 = tls.reproduction(solutions[parent1], solutions[parent2], 0, nbInter - 1, finCol, nbMis - 1)
+        # On choisie ce que l'on va faire avec les enfants, s'il est valide ou non
+
+        valideFille1 = fct.contraintes(fille1, mission, intervenants, distances)
+        valideFille2 = fct.contraintes(fille2, mission, intervenants, distances)
+
+        if valideFille1:
+            # Si l'enfant est valide on remplace le pire de la population par l'enfant
+            fitnessFille1Em = choixFitness_1("employe", mission, intervenants, fille1, distances)
+            fitnessFille1Sess = choixFitness_1("SESSAD", mission, intervenants, fille1, distances)
+            fitnessFille1Etu = choixFitness_1("etudiant", mission, intervenants, fille1, distances)
+            indice = tls.choixKill(tableau_fitEm)
+            # indice, max = maxiFit(tableau_fit)
+            # if fitnessFille1 < max:
+            if fitnessFille1Em < tableau_fitEm[indice] and fitnessFille1Sess < tableau_fitSess[indice] and fitnessFille1Etu < tableau_fitEtu[indice]:
+                solutions[indice] = fille1
+                tableau_fitEm[indice] = fitnessFille1Em
+                tableau_fitSess[indice] = fitnessFille1Sess
+                tableau_fitEtu[indice] = fitnessFille1Etu
+                geneCons += 1
+
+        if valideFille2:
+            # Si l'enfant est valide on remplace le pire de la population par l'enfant
+            fitnessFille2Em = choixFitness_1("employe", mission, intervenants, fille2, distances)
+            fitnessFille2Sess = choixFitness_1("SESSAD", mission, intervenants, fille2, distances)
+            fitnessFille2Etu = choixFitness_1("etudiant", mission, intervenants, fille2, distances)
+            indice = tls.choixKill(tableau_fitEm)
+            # indice, max = maxiFit(tableau_fit)
+            # if fitnessFille2 < max:
+            if fitnessFille2Em < tableau_fitEm[indice] and fitnessFille2Sess < tableau_fitSess[indice] and fitnessFille2Etu < tableau_fitEtu[indice]:
+                solutions[indice] = fille2
+                tableau_fitEm[indice] = fitnessFille2Em
+                tableau_fitSess[indice] = fitnessFille2Sess
+                tableau_fitEtu[indice] = fitnessFille2Etu
+                geneCons += 1
+
+        ## On fait une mutation
+        # On choisit une solution
+
+        if rd.random() < probaMutation:
+            # On choisit de faire une mutation
+            solutionChoisie = rd.randint(0, nbPlanning - 1)
+            fitnessChoisiePourMutation = choixFitness_1("employe", mission, intervenants, solutions[solutionChoisie],
+                                                        distances)
+            mutate = tls.mutation(solutions[solutionChoisie])
+            valideMutate = fct.contraintes(mutate, mission, intervenants, distances)
+            if valideMutate:
+                # Si la mutation est valide
+                empire = rd.random()
+                fitnessMutateEm = choixFitness_1("employe", mission, intervenants, mutate, distances)
+                fitnessMutateSess = choixFitness_1("SESSAD", mission, intervenants, mutate, distances)
+                fitnessMutateEtu = choixFitness_1("etudiant", mission, intervenants, mutate, distances)
+                if empire > probaMissionEmpire:
+                    # Si elle améliore le fitness de la solution choisie on met à jour la solution
+                    if fitnessMutateEm < fitnessChoisiePourMutation and fitnessMutateSess < fitnessChoisiePourMutation and fitnessMutateEtu < fitnessChoisiePourMutation:
+                        solutions[solutionChoisie] = mutate
+                        tableau_fitEm[solutionChoisie] = fitnessMutateEm
+                        tableau_fitSess[solutionChoisie] = fitnessMutateSess
+                        tableau_fitEtu[solutionChoisie] = fitnessMutateEtu
+                else:
+                    # Si elle n'améliore pas le fitness de la solution choisie on met à jour seulement si on a le
+                    # droit d'empirer la solution
+                    solutions[solutionChoisie] = mutate
+                    tableau_fitEm[solutionChoisie] = fitnessMutateEm
+                    tableau_fitSess[solutionChoisie] = fitnessMutateSess
+                    tableau_fitEtu[solutionChoisie] = fitnessMutateEtu
+
+        if valideFille1 or valideFille2:
+            nbGene += 1
+            secu = 0
+        else:
+            nbGene = nbGene
+            secu += 1
+
+
+        if secu > nbGeneration*0.5 and colon:
+            solutions = cp.deepcopy(tls.remplacement(tableau_fitEm, solutions, intervenants, mission, distances))
+            tableau_fitEm = cp.deepcopy(choixFitness_tableau("employe", mission, intervenants, solutions, distances))
+            tableau_fitSess = cp.deepcopy(choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances))
+            tableau_fitEtu = cp.deepcopy(choixFitness_tableau("etudiant", mission, intervenants, solutions, distances))
+            print("Nouvelle population, des colons arrivent")
+            secu = 0
+
+
+    if secu > nbGeneration-2:
+        print("Nombre de générations faites :", nbGene)
+        print("Arret de la recherche")
+
+    print("Nombre de générations conservées :", geneCons)
+
+    return solutions
+
+
+
+
 def main():
     matrice_distance, intervenants, missions = fct.charge_fichier_csv("45-4")
     soll = pop.gen_n_solutions_uniques(100, intervenants, missions, matrice_distance)
@@ -630,7 +748,7 @@ def main():
     print("etudiant avant")
     print(min(fEt.fitnessEtudiants_tout(soll, missions, intervenants)))
     debut = ti.time()
-    apres = genetiqueMoyenneNorma(soll, 10000, 0.2, matrice_distance, intervenants, missions, 0.0, False)
+    apres = genetiqueCascade_fit(soll, 10000, 0.2, matrice_distance, intervenants, missions, 0.0, False)
     fin = ti.time()
     print("emplo apres")
     print(min(tableau_fitnessEM(missions, intervenants, apres, matrice_distance)))
