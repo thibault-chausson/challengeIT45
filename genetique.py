@@ -683,8 +683,12 @@ def genetiqueCascade_fit(solution, nbGeneration, probaMutation, distances, inter
         if rd.random() < probaMutation:
             # On choisit de faire une mutation
             solutionChoisie = rd.randint(0, nbPlanning - 1)
-            fitnessChoisiePourMutation = choixFitness_1("employe", mission, intervenants, solutions[solutionChoisie],
+            fitnessChoisiePourMutationEm = choixFitness_1("employe", mission, intervenants, solutions[solutionChoisie],
                                                         distances)
+            fitnessChoisiePourMutationSess = choixFitness_1("SESSAD", mission, intervenants, solutions[solutionChoisie],
+                                                            distances)
+            fitnessChoisiePourMutationEtu = choixFitness_1("etudiant", mission, intervenants, solutions[solutionChoisie],
+                                                              distances)
             mutate = tls.mutation(solutions[solutionChoisie])
             valideMutate = fct.contraintes(mutate, mission, intervenants, distances)
             if valideMutate:
@@ -695,7 +699,7 @@ def genetiqueCascade_fit(solution, nbGeneration, probaMutation, distances, inter
                 fitnessMutateEtu = choixFitness_1("etudiant", mission, intervenants, mutate, distances)
                 if empire > probaMissionEmpire:
                     # Si elle améliore le fitness de la solution choisie on met à jour la solution
-                    if fitnessMutateEm < fitnessChoisiePourMutation and fitnessMutateSess < fitnessChoisiePourMutation and fitnessMutateEtu < fitnessChoisiePourMutation:
+                    if fitnessMutateEm < fitnessChoisiePourMutationEm and fitnessMutateSess < fitnessChoisiePourMutationSess and fitnessMutateEtu < fitnessChoisiePourMutationEtu:
                         solutions[solutionChoisie] = mutate
                         tableau_fitEm[solutionChoisie] = fitnessMutateEm
                         tableau_fitSess[solutionChoisie] = fitnessMutateSess

@@ -35,7 +35,7 @@ def duree(deb, nbPopMax, pas, matrice_distance, intervenants, missions, type, so
     for i in range(deb, nbPopMax, pas):
         sol2 = copy.deepcopy(sol)
         debut = ti.time()
-        sol = gene.genetiqueMoyenneNorma(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.0, True)
+        sol = gene.genetiqueCascade_fit(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.0, True)
         fin = ti.time()
         x.append(x[indice] + i)
         temps.append(temps[indice] + fin - debut)
@@ -65,7 +65,7 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
     indice = 0
     sol2 = copy.deepcopy(sol)
     for i in range(deb, nbPopMax + pas, pas):
-        sol3 = copy.deepcopy(gene.genetiqueMoyenneNorma(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.00, True))
+        sol3 = copy.deepcopy(gene.genetiqueCascade_fit(sol2, i, 0.1, matrice_distance, intervenants, missions, 0.00, False))
         sol2 = copy.deepcopy(sol3)
         fit_1 = min(gene.choixFitness_tableau("etudiant", missions, intervenants, sol2, matrice_distance))
         fit_2 = min(gene.choixFitness_tableau("employe", missions, intervenants, sol2, matrice_distance))
@@ -99,7 +99,7 @@ def evolutionFit(deb, nbPopMax, pas, type, matrice_distance, intervenants, missi
     subplot3.set_title('SESSAD')
 
 
-    fig.suptitle("Évolution de la fitness SESSAD pour l'agorithme en fonction du nombre de générations")
+    fig.suptitle("Évolution de la fitness pour l'agorithme en cascade pour les fitness en fonction du nombre de générations")
 
 
 
