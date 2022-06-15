@@ -213,3 +213,33 @@ def affichagePareto(solution, Mission, Intervenants, Distances):
         print("La solution est : ", solution[sol[i]])
         print("Le planning est :", planning)
         print("\n")
+
+
+def affichageCascadeFit(solutions, Mission, Intervenants, Distances):
+    fit_SE = g.choixFitness_tableau("SESSAD", Mission, Intervenants, solutions, Distances)
+    fit_EM = g.choixFitness_tableau("employe", Mission, Intervenants, solutions, Distances)
+    fit_ET = g.choixFitness_tableau("etudiant", Mission, Intervenants, solutions, Distances)
+
+    sols = []
+
+    fit_SE_trie = sorted(fit_SE)
+    fit_EM_trie = sorted(fit_EM)
+    fit_ET_trie = sorted(fit_ET)
+
+
+    for i in range(len(solutions)):
+        index = fit_SE_trie.index(fit_SE[i]) + fit_EM_trie.index(fit_EM[i]) + fit_ET_trie.index(fit_ET[i])
+        sols.append((index, solutions[i], (fit_SE[i], fit_EM[i], fit_ET[i])))
+
+    sols_sorted = sorted(sols, key=lambda x: x[0])
+
+    print("Fitness meilleure solution: ")
+    print("\tSESSAD:", sols_sorted[0][2][0])
+    print("\temployé:", sols_sorted[0][2][1])
+    print("\tétudiant:", sols_sorted[0][2][2])
+
+    print("Meilleure solution: ")
+    for i in sols_sorted[0][1]:
+        print(i)
+
+ 

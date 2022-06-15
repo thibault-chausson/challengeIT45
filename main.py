@@ -36,7 +36,7 @@ def main():
     parser.add_argument('-f', '--fitness', type=str, help='Type de fitness, argument nécessaire en cas de --type=classique')
     parser.add_argument('-e', '--empire', type=float, help='Probabilité de garder un individu, même s\'il réduit la fitness')
     parser.add_argument('-r', '--remplace', action='store_true', help='Choisir si l\'on remplace la moitiée de la population en cas de blocage ou non, par défaut à False')
-    parser.add_argument('-t', '--type', type=str, help='Type d\'algorithme utilisé: classique / cascade / pareto / moyenne / moyenne_normalisee')
+    parser.add_argument('-t', '--type', type=str, help='Type d\'algorithme utilisé: classique / cascade / cascade_fit / pareto / moyenne / moyenne_normalisee')
     
     args = parser.parse_args()
 
@@ -72,6 +72,9 @@ def main():
     elif type_algo == "normalisee":
         pop_resultante = genetique.genetiqueMoyenneNorma(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, remplace)
         tls.affichageClassique(pop_resultante, type_fit, MISSIONS, INTERVENANTS, MATRICE_DISTANCE, "normal")
+    elif type_algo == "cascade_fit":
+        pop_resultante = genetique.genetiqueCascade_fit(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, remplace)
+        tls.affichageCascadeFit(pop_resultante, MISSIONS, INTERVENANTS, MATRICE_DISTANCE)
     else:
         print("Erreur: type d'algorithme non reconnu")
         sys.exit(1)
