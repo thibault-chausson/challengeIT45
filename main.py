@@ -5,6 +5,7 @@ import fitnessSESSAD
 import fitnessEmployes
 import argparse
 import tools as tls
+import paretoFront as pf
 
 from functions import *
 
@@ -65,7 +66,7 @@ def main():
         tls.affichageClassique(pop_resultante, type_fit, MISSIONS, INTERVENANTS, MATRICE_DISTANCE, "cascade")
     elif type_algo == "pareto":
         pop_resultante = genetique.genetiquePareto(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire)
-        tls.affichagePareto(pop_resultante, MISSIONS, INTERVENANTS, MATRICE_DISTANCE)
+        pf.affichagePareto(pop_resultante, MISSIONS, INTERVENANTS, MATRICE_DISTANCE)
     elif type_algo == "moyenne":
         pop_resultante = genetique.genetiqueMoyenne(pop_initiale, nbGeneration, probaMutation, MATRICE_DISTANCE, INTERVENANTS, MISSIONS, probaMissionEmpire, remplace)
         tls.affichageClassique(pop_resultante, type_fit, MISSIONS, INTERVENANTS, MATRICE_DISTANCE, "moyenne")
