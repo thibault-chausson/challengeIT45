@@ -34,7 +34,7 @@ def main():
     parser.add_argument('-p', '--population', type=int, help='Nombre d\'individus dans la population')
     parser.add_argument('-m', '--mutation', type=float, help='Probabilité de mutation')
     parser.add_argument('-n', '--nbTour', type=int, help='Nombre d\'éxecutions de l\'algorithme génétique en cascade, 1 par défaut')
-    parser.add_argument('-f', '--fitness', type=str, help='Type de fitness, argument nécessaire en cas de --type=classique')
+    parser.add_argument('-f', '--fitness', type=str, help='Type de fitness, argument nécessaire en cas de --type=SESSAD / employe / etudiant')
     parser.add_argument('-e', '--empire', type=float, help='Probabilité de garder un individu, même s\'il réduit la fitness')
     parser.add_argument('-r', '--remplace', action='store_true', help='Choisir si l\'on remplace la moitiée de la population en cas de blocage ou non, par défaut à False')
     parser.add_argument('-t', '--type', type=str, help='Type d\'algorithme utilisé: classique / cascade / cascade_fit / pareto / moyenne / moyenne_normalisee')
