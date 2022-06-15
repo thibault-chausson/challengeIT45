@@ -30,7 +30,7 @@ Voici quelques exemples d'éxecution :
 py main.py --help
 py main.py -g 10000 -p 150 -m 0.1 -e 0 -t cascade_fit -d 45-4 --remplace
 py main.py -g 10000 -p 200 -m 0.1 -e 0 -t cascade -d 45-4 --remplace
-py main.py -g 20000 -p 600 -m 0.1 -e 0 -t classique -f sessad -d 100-10 --remplace
+py main.py -g 20000 -p 600 -m 0.1 -e 0 -t classique -f SESSAD -d 100-10 --remplace
 py main.py -g 8000 -p 250 -m 0.1 -e 0 -t moyenne -d 96-6 --remplace
 py main.py -g 8000 -p 250 -m 0.1 -e 0 -t moyenne_normalise -d 100-10
 py main.py -g 8000 -p 250 -m 0.2 -e 0.1 -t cascade_fit -d 45-4 --remplace
