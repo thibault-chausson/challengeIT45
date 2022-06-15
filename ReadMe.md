@@ -37,7 +37,7 @@ py main.py -g 8000 -p 250 -m 0.2 -e 0.1 -t cascade_fit -d 45-4 --remplace
 ```
 
 #### Linux
-```sh
+```shell
 python3 main.py --help
 python3 main.py -g 10000 -p 150 -m 0.1 -e 0 -t cascade_fit -d 45-4 --remplace
 python3 main.py -g 10000 -p 200 -m 0.1 -e 0 -t cascade -d 45-4 --remplace
