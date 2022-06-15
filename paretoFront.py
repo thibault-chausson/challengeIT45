@@ -4,6 +4,9 @@ on the Pareto frontier, sorted into order.
 '''
 
 import numpy as np
+import genetique as gen
+import matplotlib.pyplot as plt
+
 
 def pareto_frontier_multi(X,Y,Z):
     myList = [[X[i], Y[i], Z[i]] for i in range(len(X))]
@@ -80,7 +83,24 @@ def pareto_frontier_multi_kill(X,Y,Z):
 
 
 
-
+def affichagePareto (solutions, mission, intervenants, distances):
+    fitnessEm = gen.choixFitness_tableau("employe", mission, intervenants, solutions, distances)
+    fitnessEt = gen.choixFitness_tableau("etudiant", mission, intervenants, solutions, distances)
+    fitnessSe = gen.choixFitness_tableau("SESSAD", mission, intervenants, solutions, distances)
+    p_front = pareto_frontier_multi(fitnessEm, fitnessEt, fitnessSe)
+    # Find lowest values for cost and highest for savings
+    # Plot a scatter graph of all results
+    fig = plt.figure()
+    ax = fig.gca(projection='3d')  # Affichage en 3D
+    ax.scatter(fitnessEm, fitnessEt, fitnessSe, label='Courbe', marker='d')  # Tracé des points 3D
+    # Then plot the Pareto frontier on top
+    plt.plot(p_front[0], p_front[1],p_front[2], color='red')
+    plt.title("Solution avec le front de Pareto")
+    ax.set_xlabel('Fitness employé')
+    ax.set_ylabel('Fitness étudiant')
+    ax.set_zlabel('Fitness SESSAD')
+    plt.tight_layout()
+    plt.show()
 
 
 
