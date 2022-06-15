@@ -57,7 +57,7 @@ def pareto_frontier_multi_kill(X,Y,Z):
     pareto_frontier = myArray[0:1,:]
     # Test next row against the last row in pareto_frontier
     for row in myArray[1:,:]:
-        if sum([row[x] <= pareto_frontier[-1][x]
+        if sum([row[x] >= pareto_frontier[-1][x]
                 for x in range(len(row))]) != len(row):
             # If it is better on all features add the row to pareto_frontier
             pareto_frontier = np.concatenate((pareto_frontier, [row]))
@@ -92,15 +92,20 @@ def affichagePareto (solutions, mission, intervenants, distances):
     # Plot a scatter graph of all results
     fig = plt.figure()
     ax = fig.gca(projection='3d')  # Affichage en 3D
-    ax.scatter(fitnessEm, fitnessEt, fitnessSe, label='Courbe', marker='d')  # Tracé des points 3D
+    fitnessEmDel = np.delete(fitnessEm, p_front[3])
+    fitnessEtDel = np.delete(fitnessEt, p_front[3])
+    fitnessSeDel = np.delete(fitnessSe, p_front[3])
+    ax.scatter(fitnessEmDel, fitnessEtDel, fitnessSeDel, label='Courbe', marker='d')  # Tracé des points 3D
     # Then plot the Pareto frontier on top
-    plt.plot(p_front[0], p_front[1],p_front[2], color='red')
+    ax.scatter(p_front[0], p_front[1], p_front[2], color='red', label='Pareto frontier')
     plt.title("Solution avec le front de Pareto")
     ax.set_xlabel('Fitness employé')
     ax.set_ylabel('Fitness étudiant')
     ax.set_zlabel('Fitness SESSAD')
     plt.tight_layout()
     plt.show()
+
+
 
 
 
